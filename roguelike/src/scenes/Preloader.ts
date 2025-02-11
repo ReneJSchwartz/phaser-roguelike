@@ -34,8 +34,14 @@ export class Preloader extends Scene {
     }
 
     preload() {
+        // These go to global persistent cache. 
+        // Due to low amount of assets these will be kept in memory for now.
+        
         this.load.setPath('assets');
         this.load.image('logo', 'logo.png');
+        
+        // UI & Main Menu
+        this.load.image('ui-border-1', 'panel-border-009.png');
     }
 
     create() {
