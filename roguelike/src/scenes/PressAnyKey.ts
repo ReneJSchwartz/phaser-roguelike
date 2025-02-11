@@ -6,10 +6,11 @@ export class PressAnyKey extends Scene {
     }
 
     create() {
+        this.cameras.main.setBackgroundColor(0x302d2d);
+
         var screenWidth = this.cameras.main.width;
         var screenHeight = this.cameras.main.height;
 
-        this.add.image(512, 384, 'background');
         this.add.text(screenWidth / 2, screenHeight * 0.9, 'Press Any Key To Continue', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,

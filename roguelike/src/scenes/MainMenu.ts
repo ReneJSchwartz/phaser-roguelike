@@ -1,9 +1,13 @@
 import { Scene, GameObjects } from 'phaser';
+import { Game } from './Game';
 
+/** 
+ * Main menu view. 
+ * Has buttons for starting the game etc.
+ */
 export class MainMenu extends Scene {
-    background: GameObjects.Image;
-    logo: GameObjects.Image;
     gameTitle: GameObjects.Text;
+    gameName: string = 'fUntitled Roguelike';
 
     constructor() {
         super('MainMenu');
@@ -12,13 +16,14 @@ export class MainMenu extends Scene {
     create() {
         const { width, height } = this.scale;
 
-        this.background = this.add.image(512, 384, 'background');
+        this.cameras.main.setBackgroundColor(0x302d2d);
 
-        this.gameTitle = this.add.text(width * 0.5, height * 0.25, 'fUntitled Roguelike', {
-            fontFamily: 'Arial Black', fontSize: 42, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 6,
-            align: 'center'
-        }).setOrigin(0.5);
+        this.gameTitle = this.add.text(width * 0.5, height * 0.25, this.gameName,
+            {
+                fontFamily: 'Arial Black', fontSize: 42, color: '#ffffff',
+                stroke: '#000000', strokeThickness: 6,
+                align: 'center'
+            }).setOrigin(0.5);
 
         // Add Main Menu's main buttons: 
         // New Game, High Scores, Credits, Quit Game.
@@ -27,8 +32,7 @@ export class MainMenu extends Scene {
             .setSize(width * 0.3, 0)
             .setInteractive()
             .on('pointerdown', () => {
-                console.log("Start New Game!");
-                this.scene.start('Game');
+                this.scene.start(Game.name);
             });
         this.add.text(newGameButton.x, newGameButton.y, 'New Game')
             .setOrigin(0.5)

@@ -1,22 +1,22 @@
 import { Scene } from 'phaser';
+import { Preloader } from './Preloader';
 
-export class Boot extends Scene
-{
-    constructor ()
-    {
+/** 
+ * First scene of the game. 
+ * A lite preloader for the actual @see Preloader scene if you will.
+ *  */
+export class Boot extends Scene {
+    constructor() {
         super('Boot');
     }
 
-    preload ()
-    {
-        //  The Boot Scene is typically used to load in any assets you require for your Preloader, such as a game logo or background.
-        //  The smaller the file size of the assets, the better, as the Boot Scene itself has no preloader.
+    preload() {
 
-        this.load.image('background', 'assets/bg.png');
     }
 
-    create ()
-    {
-        this.scene.start('Preloader');
+    create() {
+        this.cameras.main.setBackgroundColor(0x302d2d);
+
+        this.scene.start(Preloader.name);
     }
 }

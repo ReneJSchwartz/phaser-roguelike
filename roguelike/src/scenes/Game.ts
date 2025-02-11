@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 
+/** Main adventure gamemode that is started by selecting New Game. */
 export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
 
