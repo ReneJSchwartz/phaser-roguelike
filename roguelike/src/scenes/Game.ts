@@ -1,8 +1,10 @@
 import { Scene } from 'phaser';
+import { GameManager } from '../game-manager';
 
 /** Main adventure gamemode that is started by selecting New Game. */
 export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
+    gameManager: GameManager;
 
     constructor() {
         super('Game');
@@ -17,5 +19,8 @@ export class Game extends Scene {
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
+
+        this.gameManager = new GameManager();
+        this.gameManager.startGame();
     }
 }
