@@ -16,8 +16,6 @@ export class MainMenu extends Scene {
     create() {
         const { width, height } = this.scale;
 
-        this.cameras.main.setBackgroundColor(0x302d2d);
-
         this.gameTitle = this.add.text(width * 0.5, height * 0.25, this.gameName,
             {
                 fontFamily: 'Arial Black', fontSize: 42, color: '#ffffff',

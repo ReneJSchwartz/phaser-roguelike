@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { Preloader } from './Preloader';
+import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 
 /** 
  * First scene of the game. 
@@ -18,5 +19,6 @@ export class Boot extends Scene {
         this.cameras.main.setBackgroundColor(0x302d2d);
 
         this.scene.start(Preloader.name);
+        this.scene.launch(ScreenBackgroundColor.name);
     }
 }

@@ -6,6 +6,7 @@ import { Preloader } from './scenes/Preloader';
 
 import { Game, Types } from "phaser";
 import { PressAnyKey } from './scenes/PressAnyKey';
+import { ScreenBackgroundColor } from './scenes/ScreenBackgroundColor';
 
 //  Find out more information about the Game Config at:
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
@@ -21,6 +22,7 @@ const config: Types.Core.GameConfig = {
     },
     scene: [
         Boot,
+        ScreenBackgroundColor,
         Preloader,
         PressAnyKey,
         MainMenu,

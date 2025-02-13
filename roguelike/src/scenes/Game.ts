@@ -12,7 +12,6 @@ export class Game extends Scene {
 
     create() {
         this.camera = this.cameras.main;
-        this.camera.setBackgroundColor(0x302d2d);
 
         this.add.text(512, 384, 'Insert Gameplay here.', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',

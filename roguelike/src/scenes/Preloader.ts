@@ -22,8 +22,6 @@ export class Preloader extends Scene {
     init() {
         const { width, height } = this.scale;
 
-        this.cameras.main.setBackgroundColor(0x302d2d);
-
         // Outline of progress bar.
         this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
         // Progress bar fill.
