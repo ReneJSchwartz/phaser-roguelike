@@ -69,8 +69,6 @@ export class ScreenBackgroundColor extends Scene {
      * Might need restarting from time tot time.     
      */
     private startTween(): void {
-        console.log(this.redLevel);
-
         this.tween = this.tweens.add({
             targets: this.cameras.main.backgroundColor,
             red: this.redLevel,
