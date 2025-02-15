@@ -32,11 +32,15 @@ export class ScreenBackgroundColor extends Scene {
      * */
     private baseDurationMs: number = 2000;
     /**
-     * The tween that animates all this. Tween can be controlled with
-     * this reference and it also controls itself when it repeats.
+     * The tween that animates the pulsing background color. Tween can be 
+     * controlled with this reference and it also controls itself.
      */
-    private tween: Phaser.Tweens.Tween;
-
+    private bgColorTween: Phaser.Tweens.Tween;
+    /** 
+     * Reference to screen flash tween so it can be restarted if needed
+     * to get rid of visual bugs that happen without restarting it.
+     */
+    private screenFlashTween: Phaser.Tweens.Tween;
     /**
      * Lazy singletonish access pattern for accessing
      * ScreenBackgroundColor. Could be maybe refactored away if
@@ -69,7 +73,7 @@ export class ScreenBackgroundColor extends Scene {
      * Might need restarting from time tot time.     
      */
     private startTween(): void {
-        this.tween = this.tweens.add({
+        this.bgColorTween = this.tweens.add({
             targets: this.cameras.main.backgroundColor,
             red: this.redLevel,
             green: 11,
@@ -78,8 +82,8 @@ export class ScreenBackgroundColor extends Scene {
             yoyo: true,
             repeat: -1,
             onRepeat: () => {
-                this.tween.updateTo('red', this.redLevel);
-                this.tween.timeScale = this.timeScale;
+                this.bgColorTween.updateTo('red', this.redLevel);
+                this.bgColorTween.timeScale = this.timeScale;
             }
         });
     }
@@ -90,31 +94,35 @@ export class ScreenBackgroundColor extends Scene {
      * for user input in major menus and such (if it would work).
      */
     public redHitFlash(): void {
-        const hitFlashTween = this.tweens.add({
+        this.screenFlashTween?.complete();
+
+        this.screenFlashTween = this.tweens.add({
             targets: this.cameras.main.backgroundColor,
             red: this.hitFlashRedLevel,
             green: 11,
             blue: 9,
             duration: this.baseDurationMs,
             yoyo: true,
-            onStart: () => this.tween.pause,
-            onComplete: () => this.tween.resume()
+            onStart: () => this.bgColorTween.pause,
+            onComplete: () => this.bgColorTween.resume()
         });
-        hitFlashTween.timeScale = 3;
+        this.screenFlashTween.timeScale = 3;
     }
 
-    /** Lightens the screen for a bit. */
+    /** Lightens the screen background for a bit. */
     public briefWhiteLight(): void {
-        const whiteLightFlash = this.tweens.add({
+        this.screenFlashTween?.complete();
+
+        this.screenFlashTween = this.tweens.add({
             targets: this.cameras.main.backgroundColor,
             red: 18,
             green: 18,
             blue: 18,
             duration: this.baseDurationMs,
             yoyo: true,
-            onStart: () => this.tween.pause,
-            onComplete: () => this.tween.resume()
+            onStart: () => this.bgColorTween.pause,
+            onComplete: () => this.bgColorTween.resume()
         });
-        whiteLightFlash.timeScale = 2;
+        this.screenFlashTween.timeScale = 2;
     }
 }
