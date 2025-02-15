@@ -39,7 +39,7 @@ export class PressAnyKey extends Scene {
      * along with hiding the text that's visible on the screen. 
      * */
     private loadMainMenu(): void {
-        ScreenBackgroundColor.instance.briefWhiteLight();
+        ScreenBackgroundColor.instance.briefWhiteFlash();
 
         this.tweens.add({
             targets: this.pressAnyKeyToContinueText,

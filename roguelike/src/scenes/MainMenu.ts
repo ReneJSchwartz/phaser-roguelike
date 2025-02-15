@@ -62,7 +62,7 @@ export class MainMenu extends Scene {
         this.shouldProcessButtonPresses = false;
 
         // Visual effects for scene transition.
-        ScreenBackgroundColor.instance.briefWhiteLight();
+        ScreenBackgroundColor.instance.briefWhiteFlash();
 
         this.children.list.forEach(element => {
             this.tweens.add({
