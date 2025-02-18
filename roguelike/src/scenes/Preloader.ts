@@ -23,9 +23,10 @@ export class Preloader extends Scene {
         const { width, height } = this.scale;
 
         // Outline of progress bar.
-        this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
+        this.add.rectangle(width / 2, height / 2, 468, 32)
+        .setStrokeStyle(1, 0xffffff);
         // Progress bar fill.
-        const bar = this.add.rectangle(512 - 230, 384, 4, 28, 0xffffff);
+        const bar = this.add.rectangle(width / 2 - 468 / 2 + 4, height / 2, 4, 28, 0xffffff);
 
 
         this.loadingText = this.add.text(width / 2, height / 2, 'Loading', {

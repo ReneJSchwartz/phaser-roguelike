@@ -1,6 +1,7 @@
 import { Scene, GameObjects } from 'phaser';
 import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
+import { CharacterCreation } from './CharacterCreation';
 
 /** 
  * Main menu view. 
@@ -56,7 +57,7 @@ export class MainMenu extends Scene {
             .setSize(width * 0.3, 0)
             .setInteractive()
             .on('pointerdown', () => {
-                this.onLoadNewGameButtonClicked();
+                this.onStartNewGameButtonClicked();
                 this.buttonsExitTween();
             })
             .on('pointerover', () => newGameButtonContainer.scale = 1.07)
@@ -115,9 +116,12 @@ export class MainMenu extends Scene {
             }))
     }
 
-    /** Loads a new game and initiates visual effects. */
-    private onLoadNewGameButtonClicked(): void {
-        console.log(this.onLoadNewGameButtonClicked.name);
+    /** 
+     * Starts a new game through Character Creation screen and initiates 
+     * visual effects.
+     */
+    private onStartNewGameButtonClicked(): void {
+        console.log(this.onStartNewGameButtonClicked.name);
 
         // Guard clause against spamming buttons.
         if (this.shouldProcessButtonPresses === false) {
@@ -136,6 +140,6 @@ export class MainMenu extends Scene {
             })
         });
 
-        this.time.delayedCall(550, () => this.scene.start(Game.name));
+        this.time.delayedCall(550, () => this.scene.start(CharacterCreation.name));
     }
 }
