@@ -1,7 +1,7 @@
 import { Scene, GameObjects } from 'phaser';
 import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import { Ancestries } from '../character-creation/ancestries';
 
 /** 
  * Character creation view.
@@ -11,17 +11,10 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
  * The player also selects or randomizes their name.
  */
 export class CharacterCreation extends Scene {
-    /** 
-     * Text gameobject of the title. Subject to bring in alpha tween at the 
-     * beginning of the scene.
-     */
-    private screenTitle: GameObjects.Text;
-    /** Game name placeholder. The game is a roguelike game. */
+    /** View title is at top middle. */
     private readonly screenName: string = 'Character Creation';
     /** A simple way to prevent buttons from firing multiple times. */
     private shouldProcessButtonPresses: boolean = true;
-
-    private rexUI: RexUIPlugin;
 
     constructor() {
         super('CharacterCreation');
@@ -33,7 +26,8 @@ export class CharacterCreation extends Scene {
         const em: number = 28
         const padding: number = em * 0.5;
 
-        this.screenTitle = this.add.text(width * 0.5, height * 0.05,
+        // View title
+        this.add.text(width * 0.5, height * 0.05,
             this.screenName, {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 6, align: 'center'
@@ -41,9 +35,10 @@ export class CharacterCreation extends Scene {
             .setOrigin(0.5)
             .setAlpha(0);
 
-        // Different selection sections in the screen are in their containers
-        // for movement and filtering
-        const ancestrySectionContainer = this.add.container(width * 0.05, height * 0.15);
+        // Different containerized selection sections in the screen
+        
+        // Ancestry is the first thing on top left
+        const ancestrySectionContainer = this.add.container(width * 0.04, height * 0.15);
         const ancestryBoxOutline = this.add.rectangle(0, 0, width * 0.15, height * 0.25)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
@@ -51,37 +46,29 @@ export class CharacterCreation extends Scene {
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         const ancestryOptions = this.add.text(padding, em * 2, '> Human\n  Catfolk')
-            .setOrigin(0, 0) 
+            .setOrigin(0, 0)
             .setStyle({ fontSize: 28 });
         ancestrySectionContainer.add([ancestryBoxOutline, ancestrySectionTitle, ancestryOptions])
             .setAlpha(0);
 
-        const infoBoxSectionContainer = this.add.container(width * 0.70, height * 0.1);
-        const infoBoxBg = this.add.rectangle(0, 0, width * 0.25, height * 0.8)
+        // Info box provides info on what is currently selected.
+        const infoBoxSectionContainer = this.add.container(width * 0.70, height * 0.1)
+            .setAlpha(0);
+        const infoBoxBg = this.add.rectangle(0, 0, width * 0.26, height * 0.8)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
-        const infoBoxTitle = this.add.text(0, 0, 'Info - Catfolk')
+        const infoBoxTitle = this.add.text(padding, padding, 'Info - Human')
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
-
-        const hmm = this.add.text(0, em * 2.5, 'Lorem Ipsum Dolor Sit Amet.\n\nSecond Paragraph is veery long and it just continues.')
+        const infoBoxContent = this.add.text(padding, em * 2.5, Ancestries.catfolk.description)
             .setOrigin(0, 0)
-            .setStyle({ fontSize: 28 });
-        const infoBoxContent = this.rexUI.add.textArea({ width: 50, height: 300, text: hmm });
+            .setStyle({ fontSize: 28, wordWrap: { width: width * 0.245 } });
         infoBoxSectionContainer.add([infoBoxBg, infoBoxTitle, infoBoxContent]);
-
-
-        // this.scene.
 
         this.tweens.add({
             targets: this.children.list,
-            alpha: 1,
+            alpha: 1
         });
-    }
-
-    /** Shows text at the info box. */
-    private setTextToInfoBox(text: string) {
-
     }
 
     /** Loads a new game and initiates visual effects. */
