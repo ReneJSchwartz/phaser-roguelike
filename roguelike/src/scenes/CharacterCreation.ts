@@ -38,8 +38,21 @@ export class CharacterCreation extends Scene {
      * @see onRandomizeEverythingButtonClicked uses it for randomization.
      */
     private selectAncestryCallbacks: { (): void }[] = [];
-    /** Has UI components for example for layout groups or a text field. */
+    /** Player distributes 5 attribute points. */
+    private selectedAttributes: Attributes = new Attributes();
+    /** How much health the player has with 0 constitution. */
+    private baseHitPoints: number = 25;
+    /** Current hit points that are calculated from base and Con. */
+    private currentHitPoints: number = this.baseHitPoints;
+    /** How much HP investing 1 attribute point to Con gives. */
+    private hitPointsFromOneCon: number = 5;
+    /** How much mana the player has with 0 Spirit. */
+    private baseMana: number = 5;
+    /** How much MP investing 1 attribute point to Spi gives. */
+    private manaFromOneSpi: number = 5;
+    /** UI components: for example badly documented layout groups or a text field. */
     private rexUI: RexUIPlugin;
+
 
     constructor() {
         super('CharacterCreation');
@@ -161,12 +174,12 @@ export class CharacterCreation extends Scene {
         infoBoxSectionContainer.add([infoBoxOutline, this.infoBoxTitle, this.infoBoxContent]);
 
         // Row 2
-
         x = screenEdgesLRPadding;
         y += containerHeight + containerPadding;
+        containerHeight = height * 0.35;
 
         // Attribute points section that is lower on the screen
-        const attributesSectionContainer: GameObjects.Container = this.add.container(x, height * 0.395);
+        const attributesSectionContainer: GameObjects.Container = this.add.container(x, y);
         const attributesSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, width * 0.59, height * 0.35)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
@@ -181,24 +194,72 @@ export class CharacterCreation extends Scene {
         attributesSectionContainer.add([attributesSectionOutline, attributesSectionTitle, attributesSectionRandomizeText])
             .setAlpha(0);
 
-        // Bottom, not subject to sections/containers but rather free form.
+        // Attributes
+        // Clicking these will increase the stat amount or reset it back to 0.
+        let defaultAttributes = [['Str', 1], ['Dex', 0], ['Con', 1], ['Spi', 2], ['Kno', 1]];
+        let attributesXOffset = width * 0.11;
+        for (let i = 0; i < defaultAttributes.length; i++) {
+            const statCircle = this.add.circle(width * 0.1 + i * attributesXOffset, height * 0.55, height * 0.07, 0x000000, 1)
+                .setStrokeStyle(2, 0xffffff)
+                .setAlpha(0);
+            const statName = this.add.text(0, 0, String(defaultAttributes[i][0]))
+                .setOrigin(0)
+                .setStyle({ fontSize: 42 })
+                .setAlpha(0);
+            statName.setPosition(statCircle.x - statName.width * 0.5, statCircle.y + width * 0.05);
+            const statAmount = this.add.text(0, 0, String(defaultAttributes[i][1]), { fontSize: 56 })
+                .setOrigin(0)
+                .setAlpha(0);
+            statAmount.setPosition(statCircle.x - statAmount.width * 0.5, statCircle.y - statAmount.height * 0.5);
+        }
+
+        // Row 3, final stats
+        x = screenEdgesLRPadding;
+        y += containerHeight + containerPadding;
+        containerHeight = width * 0.04;
+
+        // Below attributes there will be final HP, MP stats
+        const statsSectionContainer: GameObjects.Container = this.add.container(x, y);
+        const statsSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, width * 0.59, containerHeight)
+            .setOrigin(0)
+            .setStrokeStyle(1, 0xffffff);
+        const statsSectionTitle = this.add.text(textPadding, textPadding,
+            `Stats:    HP: ${this.currentHitPoints}    MP: ${this.baseMana + this.selectedAttributes.spirit * this.manaFromOneSpi}    AC: ${5 + this.selectedAttributes.dexterity}`)
+            .setOrigin(0, 0)
+            .setStyle({ fontSize: 32 });
+        const statsSectionRandomizeText: GameObjects.Text = this.add.text(width * 0.35, textPadding, '')
+            .setOrigin(0)
+            .setStyle({ fontSize: 28 })
+            .setInteractive()
+            .on('pointerdown', () => { console.log('test');/* */ });
+        statsSectionContainer.add([statsSectionOutline, statsSectionTitle, statsSectionRandomizeText])
+            .setAlpha(0);
+
+
+        // Bottom of the screen: not subject to sections/containers but rather free form.
+        x = width * 0.06;
+        y = height * 0.91;
 
         // Bottom text buttons for starting the game, randomizing everything or going back to menu.
-        const startGameButton: GameObjects.Text = this.add.text(width * 0.04, height * 0.93, 'Start Game')
+        const startGameButton: GameObjects.Text = this.add.text(x, y, 'Start Game')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
             .setAlpha(0)
             .setInteractive()
             .on('pointerdown', () => { this.onFinishCharacterCreationAndStartNewGameButtonClicked(); });
 
-        const randomizeEverythingButton: GameObjects.Text = this.add.text(width * 0.22, height * 0.93, 'Randomize Everything')
+        x += width * 0.18;
+
+        const randomizeEverythingButton: GameObjects.Text = this.add.text(x, y, 'Randomize All')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
             .setAlpha(0)
             .setInteractive()
             .on('pointerdown', () => { this.onRandomizeEverythingButtonClicked(); });
 
-        const backToMenuButton: GameObjects.Text = this.add.text(width * 0.52, height * 0.93, 'Back To Menu')
+        x += width * 0.20;
+
+        const backToMenuButton: GameObjects.Text = this.add.text(x, y, 'Back To Menu')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
             .setAlpha(0)
@@ -212,13 +273,8 @@ export class CharacterCreation extends Scene {
         });
 
         this.selectAncestry(selectableAncestries[0], this.ancestriesTexts, 0);
-        const attributes = new Attributes();
-        attributes.strength = 1;
-        attributes.constitution = 1;
-        attributes.dexterity = 2;
-        attributes.knowledge = 1;
-        attributes.spirit = 0;
-        Player.Instance.setAttributes(attributes);
+
+        Player.Instance.setAttributes(this.selectedAttributes);
     }
 
     /** 

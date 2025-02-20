@@ -19,7 +19,7 @@ export class GameManager {
         new Player();
     }
 
-    /**  */
+    /** Starts game after making a character. */
     public startGame(): void {
         console.log('Game started on GameManager.');
         this.levelGen = new LevelGenerator();
