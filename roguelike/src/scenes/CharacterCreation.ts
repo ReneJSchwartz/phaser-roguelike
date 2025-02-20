@@ -4,6 +4,8 @@ import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { Ancestries, Ancestry } from '../character-creation/ancestries';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import { MainMenu } from './MainMenu';
+import { Player } from '../entities/player';
+import { Attributes } from '../character-creation/attributes';
 
 /** 
  * Character creation view.
@@ -210,6 +212,13 @@ export class CharacterCreation extends Scene {
         });
 
         this.selectAncestry(selectableAncestries[0], this.ancestriesTexts, 0);
+        const attributes = new Attributes();
+        attributes.strength = 1;
+        attributes.constitution = 1;
+        attributes.dexterity = 2;
+        attributes.knowledge = 1;
+        attributes.spirit = 0;
+        Player.Instance.setAttributes(attributes);
     }
 
     /** 
@@ -240,13 +249,15 @@ export class CharacterCreation extends Scene {
         for (let i = 0; i < options.length; i++) {
             options[i].setColor(i === index ? '#fff' : '#666');
         }
+
+        Player.Instance.setAncestry(ancestry.name);
     }
 
     // Bottom row button methods START GAME, RANDOMIZE EVERYTHING, BACK TO MENU
 
     /** Randomizes ancestry, attribute points and other things in the screen if any such as name. */
     private onRandomizeEverythingButtonClicked(): void {
-        console.log(this.onRandomizeEverythingButtonClicked.name);
+        console.log(CharacterCreation.name, this.onRandomizeEverythingButtonClicked.name);
 
         this.selectAncestryCallbacks[Phaser.Math.Between(0, this.ancestriesTexts.length - 2)].call(this);
 

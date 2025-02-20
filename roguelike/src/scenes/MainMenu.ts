@@ -2,6 +2,7 @@ import { Scene, GameObjects } from 'phaser';
 import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { CharacterCreation } from './CharacterCreation';
+import { GameManager } from '../game-manager';
 
 /** 
  * Main menu view. 
@@ -22,8 +23,15 @@ export class MainMenu extends Scene {
         super('MainMenu');
     }
 
+    /** Creates main menu UI and initializes GameManager. */
     create() {
+        // Initialize game systems after player has proceeded 
+        // from press any button.
+        new GameManager();
+
         const { width, height } = this.scale;
+
+        this.shouldProcessButtonPresses = true;
 
         // Title
         this.gameTitle = this.add.text(width * 0.5, height * 0.2,
