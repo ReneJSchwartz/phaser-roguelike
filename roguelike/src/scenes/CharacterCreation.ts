@@ -23,6 +23,19 @@ export class CharacterCreation extends Scene {
     private infoBoxTitle: GameObjects.Text;
     /** Saved so that randomization can pick a different new random ancestry every time. */
     private lastChosenAncestryIndex: number = 42;
+    /** 
+     * Ancestries text buttons. Was used for randomization. 
+     * At the moment gets the amount of ancestries which could be just a number. 
+     * */
+    private ancestriesTexts: GameObjects.Text[];
+    /** 
+     * Stores lambda callbacks that are dynamically generated through making 
+     * the clickable ancestry list in Ancestries section. 
+     * A button is not callable in code in Phaser.
+     * 
+     * @see onRandomizeEverythingButtonClicked uses it for randomization.
+     */
+    private selectAncestryCallbacks: { (): void }[] = [];
     /** Has UI components for example for layout groups or a text field. */
     private rexUI: RexUIPlugin;
 
@@ -94,22 +107,25 @@ export class CharacterCreation extends Scene {
             Ancestries.dwarf,
             Ancestries.gnome,
             Ancestries.random];
-        const ancestriesTexts: GameObjects.Text[] = [];
+        this.ancestriesTexts = [];
         for (let index = 0; index < selectableAncestries.length; index++) {
             const t = this.add.text(textPadding, em * 2 + index * em, '  ' + selectableAncestries[index].name)
                 .setOrigin(0, 0)
                 .setStyle({ fontSize: 28 })
                 .setInteractive()
-                .on('pointerdown', () => this.selectAncestry(selectableAncestries[index], ancestriesTexts, index));
-            ancestriesTexts.push(t);
+                .on('pointerdown', () => this.selectAncestry(selectableAncestries[index], this.ancestriesTexts, index));
+            this.ancestriesTexts.push(t);
+            // Button onClick callbacks are not callable by reference to the button in Phaser.
+            let func = () => { this.selectAncestry(selectableAncestries[index], this.ancestriesTexts, index) }
+            this.selectAncestryCallbacks.push(func);
             ancestrySectionContainer.add(t);
         }
         ancestrySectionContainer.add([ancestryBoxOutline, ancestrySectionTitle])
             .setAlpha(0);
 
-        // X starting point comes from old container width + starting point.
+        // X starting point comes from old container's width + starting point.
         x += containerWidth + containerPadding;
-        // New container width.
+        // New container's width.
         containerWidth = width * 0.42;
 
         // Next section can be for backgrounds or inventory or spells or starting equipment
@@ -193,7 +209,7 @@ export class CharacterCreation extends Scene {
             alpha: 1,
         });
 
-        this.selectAncestry(selectableAncestries[0], ancestriesTexts, 0);
+        this.selectAncestry(selectableAncestries[0], this.ancestriesTexts, 0);
     }
 
     /** 
@@ -207,7 +223,7 @@ export class CharacterCreation extends Scene {
         if (ancestry.name === 'Random') {
             const selectableAncestries: Ancestry[] = [Ancestries.human, Ancestries.catfolk, Ancestries.houseElf, Ancestries.dwarf, Ancestries.gnome, Ancestries.random];
 
-            let randInt: number;// = Phaser.Math.Between(0, selectableAncestries.length - 2);
+            let randInt: number;
             do {
                 randInt = Phaser.Math.Between(0, selectableAncestries.length - 2);
             } while (randInt === this.lastChosenAncestryIndex)
@@ -232,7 +248,7 @@ export class CharacterCreation extends Scene {
     private onRandomizeEverythingButtonClicked(): void {
         console.log(this.onRandomizeEverythingButtonClicked.name);
 
-        // todo reroll ancestry
+        this.selectAncestryCallbacks[Phaser.Math.Between(0, this.ancestriesTexts.length - 2)].call(this);
 
         // todo randomize attributes
     }
