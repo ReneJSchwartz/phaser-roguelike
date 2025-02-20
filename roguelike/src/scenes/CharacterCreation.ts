@@ -30,14 +30,28 @@ export class CharacterCreation extends Scene {
         super('CharacterCreation');
     }
 
+    /** 
+     * Makes UI elements to the screen. 
+     * These are title, outlined containers, and some buttons.
+     * Also fades the view in. 
+     */
     create() {
         this.shouldProcessButtonPresses = true;
 
         const { width, height } = this.scale;
         /** Font y-size. */
         const em: number = 28
-        /** Padding for text from section borders. */
-        const padding: number = em * 0.5;
+        /** Padding for text next to and inside section/container borders. */
+        const textPadding: number = em * 0.5;
+        /** Padding that sections have in relation to each other. */
+        const containerPadding: number = width * 0.02;
+        /** Left & right screen edges and sections padding amount per side. */
+        const screenEdgesLRPadding: number = width * 0.04;
+        /** 
+         * The amount of space from the top before the containers start. View 
+         * title at the top is not part of the containers and is above this.
+         */
+        const firstContainerTopPadding: number = height * 0.1;
 
         // View title
         this.add.text(width * 0.5, height * 0.05,
@@ -46,23 +60,43 @@ export class CharacterCreation extends Scene {
             stroke: '#000000', strokeThickness: 6, align: 'center'
         })
             .setOrigin(0.5)
+            // Each element is set to alpha 0 so they don't flash on fade in.
             .setAlpha(0);
 
-        // Different containerized selection sections in the screen
+        // Different containerized selection or other sections make up the view
+        // Row 1
+
+        // These values keep track of bottom left positions of where the containers should be placed.
+        // The following values are for the most leftmost item in the row whose items start with the
+        // the same y-positions.
+        /** Section y-start value. The section will be drawn beneath this. */
+        let y: number = firstContainerTopPadding;
+        /** Section x-start value. Current section will be drawn to the right. */
+        let x: number = screenEdgesLRPadding;
+        /** Section width that can be added to @see x along with padding. */
+        let containerWidth: number = width * 0.15;
+        /** Section height that can be added to y */
+        let containerHeight: number = height * 0.26;
 
         // Ancestry is the first thing on top left
-        const ancestrySectionContainer: GameObjects.Container = this.add.container(width * 0.04, height * 0.10);
-        const ancestryBoxOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, width * 0.15, height * 0.26)
+        const ancestrySectionContainer: GameObjects.Container = this.add.container(x, y);
+        const ancestryBoxOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, containerHeight)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
-        const ancestrySectionTitle: GameObjects.Text = this.add.text(padding, padding, 'Ancestry')
+        const ancestrySectionTitle: GameObjects.Text = this.add.text(textPadding, textPadding, 'Ancestry')
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         // Make ancestries list.
-        const selectableAncestries: Ancestry[] = [Ancestries.human, Ancestries.catfolk, Ancestries.houseElf, Ancestries.dwarf, Ancestries.gnome, Ancestries.random];
+        const selectableAncestries: Ancestry[] = [
+            Ancestries.human,
+            Ancestries.catfolk,
+            Ancestries.houseElf,
+            Ancestries.dwarf,
+            Ancestries.gnome,
+            Ancestries.random];
         const ancestriesTexts: GameObjects.Text[] = [];
         for (let index = 0; index < selectableAncestries.length; index++) {
-            const t = this.add.text(padding, em * 2 + index * em, '  ' + selectableAncestries[index].name)
+            const t = this.add.text(textPadding, em * 2 + index * em, '  ' + selectableAncestries[index].name)
                 .setOrigin(0, 0)
                 .setStyle({ fontSize: 28 })
                 .setInteractive()
@@ -73,26 +107,55 @@ export class CharacterCreation extends Scene {
         ancestrySectionContainer.add([ancestryBoxOutline, ancestrySectionTitle])
             .setAlpha(0);
 
+        // X starting point comes from old container width + starting point.
+        x += containerWidth + containerPadding;
+        // New container width.
+        containerWidth = width * 0.42;
+
         // Next section can be for backgrounds or inventory or spells or starting equipment
-        const nextSectionContainer: GameObjects.Container = this.add.container(width * 0.21, height * 0.10);
-        const nextSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, width * 0.42, height * 0.26)
+        const nextSectionContainer: GameObjects.Container = this.add.container(x, y);
+        const nextSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, containerHeight)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
-        const nextSectionTitle: GameObjects.Text = this.add.text(padding, padding, 'Coming soon!')
+        const nextSectionTitle: GameObjects.Text = this.add.text(textPadding, textPadding, 'Coming soon!')
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         nextSectionContainer.add([nextSectionOutline, nextSectionTitle])
             .setAlpha(0);
 
-        // Attribute points section.
-        const attributesSectionContainer: GameObjects.Container = this.add.container(width * 0.04, height * 0.395);
+        x += containerWidth + containerPadding;
+        // Info box takes the remaining space on the right side.
+        containerWidth = width - x - screenEdgesLRPadding;
+
+        // Info box provides info on what is currently selected (e.g. Ancestry description).
+        const infoBoxSectionContainer: GameObjects.Container = this.add.container(x, y)
+            .setAlpha(0);
+        // Custom height as this is not "on the grid" so to speak, it is just on the first row.
+        const infoBoxOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, height * 0.8)
+            .setOrigin(0)
+            .setStrokeStyle(1, 0xffffff);
+        this.infoBoxTitle = this.add.text(textPadding, textPadding, 'Info - Human')
+            .setOrigin(0, 0)
+            .setStyle({ fontSize: 32 });
+        this.infoBoxContent = this.add.text(textPadding, em * 2.5, Ancestries.catfolk.description)
+            .setOrigin(0, 0)
+            .setStyle({ fontSize: 28, wordWrap: { width: width * 0.3 } });
+        infoBoxSectionContainer.add([infoBoxOutline, this.infoBoxTitle, this.infoBoxContent]);
+
+        // Row 2
+
+        x = screenEdgesLRPadding;
+        y += containerHeight + containerPadding;
+
+        // Attribute points section that is lower on the screen
+        const attributesSectionContainer: GameObjects.Container = this.add.container(x, height * 0.395);
         const attributesSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, width * 0.59, height * 0.35)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
-        const attributesSectionTitle = this.add.text(padding, padding, 'Attributes (5 remaining)')
+        const attributesSectionTitle = this.add.text(textPadding, textPadding, 'Attributes (5 remaining)')
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
-        const attributesSectionRandomizeText = this.add.text(width * 0.35, padding, '[Randomize]')
+        const attributesSectionRandomizeText: GameObjects.Text = this.add.text(width * 0.35, textPadding, '[Randomize]')
             .setOrigin(0)
             .setStyle({ fontSize: 28 })
             .setInteractive()
@@ -100,42 +163,34 @@ export class CharacterCreation extends Scene {
         attributesSectionContainer.add([attributesSectionOutline, attributesSectionTitle, attributesSectionRandomizeText])
             .setAlpha(0);
 
-        // Info box provides info on what is currently selected.
-        const infoBoxSectionContainer: GameObjects.Container = this.add.container(width * 0.65, height * 0.1)
-            .setAlpha(0);
-        const infoBoxOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, width * 0.31, height * 0.8)
-            .setOrigin(0)
-            .setStrokeStyle(1, 0xffffff);
-        this.infoBoxTitle = this.add.text(padding, padding, 'Info - Human')
-            .setOrigin(0, 0)
-            .setStyle({ fontSize: 32 });
-        this.infoBoxContent = this.add.text(padding, em * 2.5, Ancestries.catfolk.description)
-            .setOrigin(0, 0)
-            .setStyle({ fontSize: 28, wordWrap: { width: width * 0.3 } });
-        infoBoxSectionContainer.add([infoBoxOutline, this.infoBoxTitle, this.infoBoxContent]);
+        // Bottom, not subject to sections/containers but rather free form.
 
         // Bottom text buttons for starting the game, randomizing everything or going back to menu.
         const startGameButton: GameObjects.Text = this.add.text(width * 0.04, height * 0.93, 'Start Game')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
+            .setAlpha(0)
             .setInteractive()
             .on('pointerdown', () => { this.onFinishCharacterCreationAndStartNewGameButtonClicked(); });
 
         const randomizeEverythingButton: GameObjects.Text = this.add.text(width * 0.22, height * 0.93, 'Randomize Everything')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
+            .setAlpha(0)
             .setInteractive()
             .on('pointerdown', () => { this.onRandomizeEverythingButtonClicked(); });
 
         const backToMenuButton: GameObjects.Text = this.add.text(width * 0.52, height * 0.93, 'Back To Menu')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
+            .setAlpha(0)
             .setInteractive()
             .on('pointerdown', () => { this.onBackToMenuButtonClicked(); });
 
+        // On start screen fades into view.
         this.tweens.add({
             targets: this.children.list,
-            alpha: 1
+            alpha: 1,
         });
 
         this.selectAncestry(selectableAncestries[0], ancestriesTexts, 0);
@@ -170,6 +225,8 @@ export class CharacterCreation extends Scene {
             options[i].setColor(i === index ? '#fff' : '#666');
         }
     }
+
+    // Bottom row button methods START GAME, RANDOMIZE EVERYTHING, BACK TO MENU
 
     /** Randomizes ancestry, attribute points and other things in the screen if any such as name. */
     private onRandomizeEverythingButtonClicked(): void {
