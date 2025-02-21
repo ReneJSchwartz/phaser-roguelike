@@ -12,4 +12,13 @@ export class Attributes {
     constructor() {
 
     }
+
+    /** Helper function to save array of numbers as attributes. */
+    public saveIntArrayAsAttributes(attributes: number[]): void {
+        this.strength = attributes[0];
+        this.dexterity = attributes[1];
+        this.constitution = attributes[2];
+        this.spirit = attributes[3];
+        this.knowledge = attributes[4];
+    }
 }

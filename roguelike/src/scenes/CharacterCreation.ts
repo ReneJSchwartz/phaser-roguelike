@@ -1,7 +1,7 @@
 import { Scene, GameObjects, Actions } from 'phaser';
 import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
-import { Ancestries, Ancestry } from '../character-creation/ancestries';
+import { Ancestries, Ancestry, AncestryType } from '../character-creation/ancestries';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import { MainMenu } from './MainMenu';
 import { Player } from '../entities/player';
@@ -25,6 +25,8 @@ export class CharacterCreation extends Scene {
     private infoBoxTitle: GameObjects.Text;
     /** Saved so that randomization can pick a different new random ancestry every time. */
     private lastChosenAncestryIndex: number = 42;
+    /** Store ancestry for checking if attribute requirement is fullfilled etc. */
+    private selectedAncestry: AncestryType = AncestryType.Human;
     /** 
      * Ancestries text buttons. Was used for randomization. 
      * At the moment gets the amount of ancestries which could be just a number. 
@@ -190,7 +192,7 @@ export class CharacterCreation extends Scene {
             .setOrigin(0)
             .setStyle({ fontSize: 28 })
             .setInteractive()
-            .on('pointerdown', () => { console.log('test');/* randomizeAttributePoints(); */ });
+            .on('pointerdown', () => { this.onRandomizeAttributesClicked(); });
         attributesSectionContainer.add([attributesSectionOutline, attributesSectionTitle, attributesSectionRandomizeText])
             .setAlpha(0);
 
@@ -277,6 +279,103 @@ export class CharacterCreation extends Scene {
         Player.Instance.setAttributes(this.selectedAttributes);
     }
 
+    /** Randomize attributes while honoring ancestry requirements. */
+    private onRandomizeAttributesClicked(): void {
+        let attributes: number[] = [1, 1, 1, 1, 1];
+        const iStr = 0;
+        const iDex = 1;
+        const iCon = 2;
+        const iSpi = 3;
+        const iKno = 4;
+
+        let overwriteTo: boolean = false;
+        let statToIncrease: number = 0;
+
+        for (let i = 0; i < 250; i++) {
+            let from = Phaser.Math.Between(0, 4);
+            let to = (from + Phaser.Math.Between(0, 3)) % 5;
+            if (overwriteTo) {
+                overwriteTo = false;
+                to = statToIncrease;
+            }
+
+            if (attributes[to] < 3 && attributes[from] > 0) {
+                attributes[to]++;
+                attributes[from]--;
+            }
+            else if (attributes[from] < 3 && attributes[to] > 0) {
+                attributes[from]++;
+                attributes[to]--;
+            }
+
+            if (i > 50) {
+                console.log('making adjustments');
+                if (this.selectedAncestry === AncestryType.Human) {
+                    // 0 required stats so every combination is valid
+                    break;
+                }
+                else if (this.selectedAncestry === AncestryType.Catfolk) {
+                    // For catfolk we aim just to increase Dex. 
+                    // This enables caster archetypes.
+                    // It is also the dominant stat.
+
+                    const combined = attributes[iDex] + attributes[iStr];
+
+                    if (attributes[iDex] === 0) {
+                        overwriteTo = true;
+                        statToIncrease = iDex;
+                        continue;
+                    }
+                    if (attributes[iDex] > 0 && combined >= 2) {
+                        break;
+                    }
+                }
+                else if (this.selectedAncestry === AncestryType.Dwarf) {
+                    // For dwarves we aim just to increase Con since 
+                    // it's the dominant stat and enables caster archetype.
+
+                    const combined = attributes[iCon] + attributes[iStr] + attributes[iSpi] + attributes[iKno];
+
+                    if (attributes[iCon] === 0) {
+                        overwriteTo = true;
+                        statToIncrease = iCon;
+                        continue;
+                    }
+                    if (attributes[iCon] > 0 && combined >= 2) {
+                        break;
+                    }
+                }
+                else if (this.selectedAncestry === AncestryType.Gnome) {
+                    const combined = attributes[iKno] + attributes[iCon] + attributes[iDex];
+
+                    if (attributes[iKno] === 0) {
+                        overwriteTo = true;
+                        statToIncrease = iKno;
+                        continue;
+                    }
+                    if (attributes[iKno] > 0 && combined >= 2) {
+                        break;
+                    }
+                }
+                else if (this.selectedAncestry === AncestryType.HouseElf) {
+                    const combined = attributes[iSpi] + attributes[iDex] + attributes[iKno];
+
+                    if (attributes[iSpi] === 0) {
+                        overwriteTo = true;
+                        statToIncrease = iSpi;
+                        continue;
+                    }
+                    if (attributes[iKno] > 0 && combined >= 2) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        this.selectedAttributes.saveIntArrayAsAttributes(attributes);
+        console.log(this.selectedAttributes);
+    }
+
     /** 
      * Populates info box and possibly controls attribute selection requirements. '
      * 
@@ -298,6 +397,7 @@ export class CharacterCreation extends Scene {
         }
 
         this.lastChosenAncestryIndex = index;
+        this.selectedAncestry = ancestry.type;
         this.infoBoxTitle.text = 'Info - ' + ancestry.name;
         this.infoBoxContent.text = ancestry.description;
 
@@ -318,6 +418,7 @@ export class CharacterCreation extends Scene {
         this.selectAncestryCallbacks[Phaser.Math.Between(0, this.ancestriesTexts.length - 2)].call(this);
 
         // todo randomize attributes
+        this.onRandomizeAttributesClicked();
     }
 
     private onBackToMenuButtonClicked(): void {
