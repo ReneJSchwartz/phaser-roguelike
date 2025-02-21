@@ -1,7 +1,9 @@
 import { Scene, GameObjects } from 'phaser';
 import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
-import { Ancestries, Ancestry, AncestryType } from '../character-creation/ancestries';
+import { Ancestries } from '../character-creation/ancestries';
+import { Ancestry } from '../character-creation/ancestry';
+import { AncestryType } from '../enums/ancestry-type';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import { MainMenu } from './MainMenu';
 import { Player } from '../entities/player';
@@ -9,10 +11,11 @@ import { Attributes } from '../character-creation/attributes';
 
 /** 
  * Character creation view.
- * In this single page view (PC) you pick your Ancestry, Background, Stats and 
- * probably spells. You can also see what will be in your inventory and info
+ * 
+ * Design: In this single page view (PC) you pick your Ancestry, Background, Stats 
+ * and probably spells. You might also see what will be in your inventory and info
  * about the currently selected items through an info panel that is always on.
- * The player also selects or randomizes their name.
+ * The player also selects or randomizes their name and age.
  */
 export class CharacterCreation extends Scene {
     /** View title is at top middle of the screen. */

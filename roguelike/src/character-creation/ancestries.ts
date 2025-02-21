@@ -1,44 +1,12 @@
-/** Compact way to store and compare ancestries. */
-export enum AncestryType {
-    Catfolk,
-    Dwarf,
-    Gnome,
-    Human,
-    HouseElf,
-    Random
-}
-
-/** 
- * Ancestry holds information about a particular ancestry such as Half-Orc.
- * Is used in char creation and later in-game. 
- */
-export class Ancestry {
-    public type: AncestryType;
-    public name: string;
-    public description: string;
-    public ingameDescription: string;
-    public perks: string;
-
-    /**
-     * Creates an Ancestry.
-     * 
-     * @param name E.g. Human.
-     * @param description Full description that appears in info box. 
-     * @param type e.g. AncestryType.Dwarf.
-     */
-    constructor(name: string, description: string, type: AncestryType) {
-        this.name = name;
-        this.description = description;
-        this.type = type;
-    }
-}
+import { AncestryType } from "../enums/ancestry-type";
+import { Ancestry } from "./ancestry";
 
 /** Contains data about available ancestries for character creation. */
 export class Ancestries {
     public static human: Ancestry = new Ancestry('Human',
         `Humans are adaptive folk well spread across continents that have a medium lifespan but are fast learners. You learn Perks at a faster rate.
 
-Humans in general don’t have any apparent strengths or weaknesses but individuals can excel in various ways. They prosper because of their differences. What sets you apart?
+Humans in general don't have any apparent strengths or weaknesses but individuals can excel in various ways. They prosper because of their differences. What sets you apart?
 
 There's no Attribute Point requirements to play a human.`,
         AncestryType.Human);
