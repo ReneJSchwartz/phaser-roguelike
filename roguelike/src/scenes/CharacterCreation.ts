@@ -207,20 +207,22 @@ export class CharacterCreation extends Scene {
         // Clicking these will increase the stat amount or reset it back to 0.
         let defaultAttributes = [['Str', 1], ['Dex', 0], ['Con', 1], ['Spi', 2], ['Kno', 1]];
         let attributesXOffset = width * 0.11;
+        const allAttributesContainer: GameObjects.Container = this.add.container(em * 4, em * 5.5);
         for (let i = 0; i < defaultAttributes.length; i++) {
-            const statCircle = this.add.circle(width * 0.1 + i * attributesXOffset, height * 0.55, height * 0.07, 0x000000, 1)
+            const singleAttributeContainer: GameObjects.Container = this.add.container(i * attributesXOffset, 0);
+            const statCircle = this.add.circle(0, 0, height * 0.07, 0x000000, 1)
                 .setStrokeStyle(2, 0xffffff)
-                .setAlpha(0);
             const statName = this.add.text(0, 0, String(defaultAttributes[i][0]))
                 .setOrigin(0)
                 .setStyle({ fontSize: 42 })
-                .setAlpha(0);
             statName.setPosition(statCircle.x - statName.width * 0.5, statCircle.y + width * 0.05);
             const statAmount = this.add.text(0, 0, String(defaultAttributes[i][1]), { fontSize: 56 })
                 .setOrigin(0)
-                .setAlpha(0);
             statAmount.setPosition(statCircle.x - statAmount.width * 0.5, statCircle.y - statAmount.height * 0.5);
+            singleAttributeContainer.add([statCircle, statName, statAmount]);
+            allAttributesContainer.add(singleAttributeContainer);
         }
+        attributesSectionContainer.add(allAttributesContainer);
 
         // Row 3, final stats
         x = screenEdgesLRPadding;
