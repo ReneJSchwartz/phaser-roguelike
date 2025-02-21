@@ -17,7 +17,7 @@ export class MainMenu extends Scene {
     /** Game name placeholder. The game is a roguelike game. */
     private readonly gameName: string = 'Like Rogue RL';
     /** A simple way to prevent buttons from firing multiple times. */
-    private shouldProcessButtonPresses: boolean = true;
+    private shouldProcessButtonPresses: boolean = false;
 
     constructor() {
         super('MainMenu');
@@ -30,8 +30,6 @@ export class MainMenu extends Scene {
         new GameManager();
 
         const { width, height } = this.scale;
-
-        this.shouldProcessButtonPresses = true;
 
         // Title
         this.gameTitle = this.add.text(width * 0.5, height * 0.2,
@@ -64,10 +62,7 @@ export class MainMenu extends Scene {
             'ui-border-1', 0, 96, 0, 20, 20)
             .setSize(width * 0.3, 0)
             .setInteractive()
-            .on('pointerdown', () => {
-                this.onStartNewGameButtonClicked();
-                this.buttonsExitTween();
-            })
+            .on('pointerdown', () => { this.onStartNewGameButtonClicked(); })
             .on('pointerover', () => newGameButtonContainer.scale = 1.07)
             .on('pointerout', () => newGameButtonContainer.scale = 1);
         const newGameButtonText = this.add.text(0, 0, 'New Game')
@@ -101,7 +96,7 @@ export class MainMenu extends Scene {
             x: position,
             ease: 'cubic.out',
             duration: 2000,
-            onComplete: () => {  },
+            onComplete: () => { this.shouldProcessButtonPresses = true; },
             delay: 500,
         });
         this.add.tween({
@@ -149,5 +144,7 @@ export class MainMenu extends Scene {
         });
 
         this.time.delayedCall(550, () => this.scene.start(CharacterCreation.name));
+
+        this.buttonsExitTween();
     }
 }
