@@ -1,4 +1,4 @@
-import { Scene, GameObjects, Actions } from 'phaser';
+import { Scene, GameObjects } from 'phaser';
 import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { Ancestries, Ancestry, AncestryType } from '../character-creation/ancestries';
@@ -23,7 +23,7 @@ export class CharacterCreation extends Scene {
     private infoBoxContent: GameObjects.Text;
     /** Infobox title needs to be synced with @see infoBoxContent. */
     private infoBoxTitle: GameObjects.Text;
-    /** Saved so that randomization can pick a different new random ancestry every time. */
+    /** Saved so that randomization can pick a different ancestry every time. */
     private lastChosenAncestryIndex: number = 42;
     /** Store ancestry for checking if attribute requirement is fullfilled etc. */
     private selectedAncestry: AncestryType = AncestryType.Human;
@@ -186,20 +186,33 @@ export class CharacterCreation extends Scene {
         x = screenEdgesLRPadding;
         y += containerHeight + containerPadding;
         containerHeight = height * 0.35;
+        containerWidth = width * 0.59;
 
         // Attribute points section that is lower on the screen
         const attributesSectionContainer: GameObjects.Container = this.add.container(x, y);
-        const attributesSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, width * 0.59, height * 0.35)
+        const attributesSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, containerHeight)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
         const attributesSectionTitle = this.add.text(textPadding, textPadding, 'Attributes (5 remaining)')
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
-        const attributesSectionRandomizeText: GameObjects.Text = this.add.text(width * 0.35, textPadding, '[Randomize]')
+        // Randomization happens by clicking a die.
+        /** Six sided die faces from 1 to 6. */
+        const d6Faces: string[] = 'd⚀⚁⚂⚃⚄⚅'.split('');
+        const attributesSectionRandomizeText: GameObjects.Text = this.add.text(containerWidth - 1.9 * em, textPadding, d6Faces[6])
             .setOrigin(0)
-            .setStyle({ fontSize: 28 })
+            .setStyle({ fontSize: 48 })
             .setInteractive()
-            .on('pointerdown', () => { this.onRandomizeAttributesClicked(); });
+            .on('pointerdown', () => {
+                this.onRandomizeAttributesClicked();
+                const curFace: string = attributesSectionRandomizeText.text;
+                let newFace: string;
+                do {
+                    newFace = d6Faces[Phaser.Math.Between(1, d6Faces.length -1)];
+                } while (curFace === newFace)
+                // todo play dice sound
+                attributesSectionRandomizeText.text = newFace;
+            });
         attributesSectionContainer.add([attributesSectionOutline, attributesSectionTitle, attributesSectionRandomizeText])
             .setAlpha(0);
 
