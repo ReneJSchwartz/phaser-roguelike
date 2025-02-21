@@ -61,6 +61,8 @@ export class CharacterCreation extends Scene {
     /** Holds HP MP AC values in UI. */
     private statsSectionText: GameObjects.Text;
     /** UI components: for example badly documented layout groups or a text field. */
+    /** Six sided unicode die faces from 1 to 6 accessable by 1-6 index. */
+    private d6Faces: string[] = 'd⚀⚁⚂⚃⚄⚅'.split('');
     private rexUI: RexUIPlugin;
 
     constructor() {
@@ -144,7 +146,9 @@ export class CharacterCreation extends Scene {
             this.selectAncestryCallbacks.push(func);
             ancestrySectionContainer.add(t);
         }
-        ancestrySectionContainer.add([ancestryBoxOutline, ancestrySectionTitle])
+        const ancestrySectionRandomizeDieButton = this.createD6Button(containerWidth - 1.9 * em, textPadding,
+            () => this.selectAncestry(Ancestries.random, this.ancestriesTexts, selectableAncestries.length - 1));
+        ancestrySectionContainer.add([ancestryBoxOutline, ancestrySectionTitle, ancestrySectionRandomizeDieButton])
             .setAlpha(0);
 
         // X starting point comes from old container's width + starting point.
@@ -197,23 +201,8 @@ export class CharacterCreation extends Scene {
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         // Randomization happens by clicking a die.
-        /** Six sided die faces from 1 to 6. */
-        const d6Faces: string[] = 'd⚀⚁⚂⚃⚄⚅'.split('');
-        const attributesSectionRandomizeText: GameObjects.Text = this.add.text(containerWidth - 1.9 * em, textPadding, d6Faces[6])
-            .setOrigin(0)
-            .setStyle({ fontSize: 48 })
-            .setInteractive()
-            .on('pointerdown', () => {
-                this.onRandomizeAttributesClicked();
-                const curFace: string = attributesSectionRandomizeText.text;
-                let newFace: string;
-                do {
-                    newFace = d6Faces[Phaser.Math.Between(1, d6Faces.length -1)];
-                } while (curFace === newFace)
-                // todo play dice sound
-                attributesSectionRandomizeText.text = newFace;
-            });
-        attributesSectionContainer.add([attributesSectionOutline, attributesSectionTitle, attributesSectionRandomizeText])
+        const attributesSectionRandomizeDieButton = this.createD6Button(containerWidth - 1.9 * em, textPadding, () => this.onRandomizeAttributesClicked());
+        attributesSectionContainer.add([attributesSectionOutline, attributesSectionTitle, attributesSectionRandomizeDieButton])
             .setAlpha(0);
 
         // Attributes
@@ -302,6 +291,25 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         this.selectAncestry(selectableAncestries[0], this.ancestriesTexts, 0);
 
         Player.Instance.setAttributes(this.selectedAttributes);
+    }
+
+    /** A d6 button component for use in randomizing character creation selections. */
+    private createD6Button(x: number, y: number, lambda: { (): void }): GameObjects.Text {
+        const dieButton: GameObjects.Text = this.add.text(x, y, this.d6Faces[Phaser.Math.Between(1, 6)])
+            .setOrigin(0)
+            .setStyle({ fontSize: 48 })
+            .setInteractive()
+            .on('pointerdown', () => {
+                lambda();
+                const curFace: string = dieButton.text;
+                let newFace: string;
+                do {
+                    newFace = this.d6Faces[Phaser.Math.Between(1, this.d6Faces.length - 1)];
+                } while (curFace === newFace)
+                // todo play dice sound
+                dieButton.text = newFace;
+            });
+        return dieButton;
     }
 
     /** 
