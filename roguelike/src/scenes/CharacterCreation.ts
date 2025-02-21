@@ -50,11 +50,18 @@ export class CharacterCreation extends Scene {
     private hitPointsFromOneCon: number = 5;
     /** How much mana the player has with 0 Spirit. */
     private baseMana: number = 5;
+    /** How much mana the player has with stat and race bonuses. */
+    private currentMana: number = this.baseMana;
     /** How much MP investing 1 attribute point to Spi gives. */
     private manaFromOneSpi: number = 5;
+    /** How much "armor class"/evasion  a player has before any stat bonuses. */
+    private baseAc: number = 5;
+    /** How much AC player has after bonuses. */
+    private currentAc: number = this.baseAc;
+    /** Holds HP MP AC values in UI. */
+    private statsSectionText: GameObjects.Text;
     /** UI components: for example badly documented layout groups or a text field. */
     private rexUI: RexUIPlugin;
-
 
     constructor() {
         super('CharacterCreation');
@@ -225,16 +232,19 @@ export class CharacterCreation extends Scene {
         const statsSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, width * 0.59, containerHeight)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
-        const statsSectionTitle = this.add.text(textPadding, textPadding,
-            `Stats:    HP: ${this.currentHitPoints}    MP: ${this.baseMana + this.selectedAttributes.spirit * this.manaFromOneSpi}    AC: ${5 + this.selectedAttributes.dexterity}`)
+        this.statsSectionText = this.add.text(textPadding, textPadding,
+            `Stats:    HP: ${25}    MP: ${5}    AC: ${5}`)
             .setOrigin(0, 0)
-            .setStyle({ fontSize: 32 });
-        const statsSectionRandomizeText: GameObjects.Text = this.add.text(width * 0.35, textPadding, '')
-            .setOrigin(0)
-            .setStyle({ fontSize: 28 })
+            .setStyle({ fontSize: 32 })
             .setInteractive()
-            .on('pointerdown', () => { console.log('test');/* */ });
-        statsSectionContainer.add([statsSectionOutline, statsSectionTitle, statsSectionRandomizeText])
+            .on('pointerdown', () => {
+                this.showInfoOnInfoBox('Stats',
+                    `HP - Hit Points. Don't let these go to zero. Constitution increases HP and its recharge rate.\n
+MP - Mana Points. Spells use 5 or 10 or 15 mana. Scrolls are single use and use no mana. After that you have a chance to learn the used scroll spell. Spirit increases MP and its recharge rate.\n
+AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor can reduce the damage (min 1).`);
+            });
+        this.updateStatsOnStatsSection();
+        statsSectionContainer.add([statsSectionOutline, this.statsSectionText])
             .setAlpha(0);
 
 
@@ -279,6 +289,30 @@ export class CharacterCreation extends Scene {
         Player.Instance.setAttributes(this.selectedAttributes);
     }
 
+    /** 
+     * Shows text on info box.
+     * 
+     * @param title Title on the top. 'Info - ' will be shown before it.
+     * @param content Content text below the title.
+     * */
+    private showInfoOnInfoBox(title: string, content: string): void {
+        this.infoBoxTitle.text = 'Info - ' + title;
+        this.infoBoxContent.text = content;
+    }
+
+    /** Updates stats (HP, MP, AC) on the bottom part of the screen. Takes class bonuses into consideration. */
+    private updateStatsOnStatsSection(): void {
+        this.currentHitPoints = this.baseHitPoints + this.selectedAttributes.constitution * this.hitPointsFromOneCon
+            + (this.selectedAncestry === AncestryType.Dwarf ? 5 : 0);
+
+        this.currentMana = this.baseMana + this.selectedAttributes.spirit * this.manaFromOneSpi;
+
+        this.currentAc = this.baseAc + this.selectedAttributes.dexterity
+            + (this.selectedAncestry === AncestryType.Catfolk ? 2 : 0);
+
+        this.statsSectionText.text = `Stats:    HP: ${this.currentHitPoints}    MP: ${this.currentMana}    AC: ${this.currentAc}`;
+    }
+
     /** Randomize attributes while honoring ancestry requirements. */
     private onRandomizeAttributesClicked(): void {
         let attributes: number[] = [1, 1, 1, 1, 1];
@@ -291,7 +325,7 @@ export class CharacterCreation extends Scene {
         let overwriteTo: boolean = false;
         let statToIncrease: number = 0;
 
-        for (let i = 0; i < 250; i++) {
+        for (let i = 0; i < 300; i++) {
             let from = Phaser.Math.Between(0, 4);
             let to = (from + Phaser.Math.Between(0, 3)) % 5;
             if (overwriteTo) {
@@ -308,8 +342,8 @@ export class CharacterCreation extends Scene {
                 attributes[to]--;
             }
 
-            if (i > 50) {
-                console.log('making adjustments');
+            if (i > 50 && i % 5 == 0) {
+                console.log('checking requirements');
                 if (this.selectedAncestry === AncestryType.Human) {
                     // 0 required stats so every combination is valid
                     break;
@@ -373,6 +407,7 @@ export class CharacterCreation extends Scene {
         }
 
         this.selectedAttributes.saveIntArrayAsAttributes(attributes);
+        this.updateStatsOnStatsSection();
         console.log(this.selectedAttributes);
     }
 
@@ -406,6 +441,7 @@ export class CharacterCreation extends Scene {
             options[i].setColor(i === index ? '#fff' : '#666');
         }
 
+        this.updateStatsOnStatsSection();
         Player.Instance.setAncestry(ancestry.name);
     }
 
