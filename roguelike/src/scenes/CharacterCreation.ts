@@ -333,7 +333,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         this.currentAc = this.baseAc + this.selectedAttributes.dexterity
             + (this.selectedAncestry === AncestryType.Catfolk ? 2 : 0);
 
-        this.statsSectionText.text = `Stats:    HP: ${this.currentHitPoints}    MP: ${this.currentMana}    AC: ${this.currentAc}`;
+        this.statsSectionText.text = `Stats:    HP: ${this.currentHitPoints}    MP: ${this.currentMana.toString().padEnd(2, ' ')}    AC: ${this.currentAc}`;
     }
 
     /** Randomize attributes while honoring ancestry requirements. */
