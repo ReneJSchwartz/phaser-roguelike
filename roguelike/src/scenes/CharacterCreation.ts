@@ -8,6 +8,7 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import { MainMenu } from './MainMenu';
 import { Player } from '../entities/player';
 import { Attributes } from '../character-creation/attributes';
+import { Attribute } from '../enums/attribute';
 
 /** 
  * Character creation view.
@@ -63,10 +64,28 @@ export class CharacterCreation extends Scene {
     private currentAc: number = this.baseAc;
     /** Holds HP MP AC values in UI. */
     private statsSectionText: GameObjects.Text;
-    /** UI components: for example badly documented layout groups or a text field. */
     /** Six sided unicode die faces from 1 to 6 accessable by 1-6 index. */
     private d6Faces: string[] = 'd⚀⚁⚂⚃⚄⚅'.split('');
+    /** UI components: for example badly documented layout groups or a text field. */
     private rexUI: RexUIPlugin;
+    // Attributes selection
+    /** Amount of available attribute points that have not yet been placed. */
+    private remainingAttributePoints: number = 5;
+    /** 
+     * Numbers inside attribute circles. The number is between 0 and 3. 
+     * The indexes correspond to Attribute enum values. 
+     */
+    private attributeAmounts: GameObjects.Text[] = [];
+    /** Attribute circles. */
+    private attributeCircles: GameObjects.Arc[] = [];
+    // Bottom row buttons
+    /** 
+     * Start game button needs to be only enabled when user has a valid 
+     * character meaning one that has correctly set up attribute points.
+     */
+    private startGameButton: GameObjects.Text;
+
+
 
     constructor() {
         super('CharacterCreation');
@@ -134,8 +153,7 @@ export class CharacterCreation extends Scene {
             Ancestries.catfolk,
             Ancestries.houseElf,
             Ancestries.dwarf,
-            Ancestries.gnome,
-            Ancestries.random];
+            Ancestries.gnome];
         this.ancestriesTexts = [];
         for (let index = 0; index < selectableAncestries.length; index++) {
             const t = this.add.text(textPadding, em * 2 + index * em, '  ' + selectableAncestries[index].name)
@@ -204,28 +222,39 @@ export class CharacterCreation extends Scene {
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         // Randomization happens by clicking a die.
-        const attributesSectionRandomizeDieButton = this.createD6Button(containerWidth - 1.9 * em, textPadding, () => this.onRandomizeAttributesClicked());
+        const attributesSectionRandomizeDieButton = this.createD6Button(containerWidth - 1.9 * em, textPadding,
+            () => this.onRandomizeAttributesClicked());
         attributesSectionContainer.add([attributesSectionOutline, attributesSectionTitle, attributesSectionRandomizeDieButton])
             .setAlpha(0);
 
-        // Attributes
-        // Clicking these will increase the stat amount or reset it back to 0.
-        let defaultAttributes = [['Str', 1], ['Dex', 0], ['Con', 1], ['Spi', 2], ['Kno', 1]];
-        let attributesXOffset = width * 0.11;
+        // Attribute circles, numbers and legend
+        // Clicking these will increase the attribute amount or reset it back to 0.
+        let attributeNames: string[] = ['Str', 'Dex', 'Con', 'Spi', 'Kno'];
+        let attributesXOffset: number = width * 0.11;
         const allAttributesContainer: GameObjects.Container = this.add.container(em * 4, em * 5.5);
-        for (let i = 0; i < defaultAttributes.length; i++) {
+        for (let i = 0; i < 5; i++) {
             const singleAttributeContainer: GameObjects.Container = this.add.container(i * attributesXOffset, 0);
-            const statCircle = this.add.circle(0, 0, height * 0.07, 0x000000, 1)
+            const attributeCircle: GameObjects.Arc = this.add.circle(0, 0, height * 0.07, 0x000000, 1)
                 .setStrokeStyle(2, 0xffffff)
-            const statName = this.add.text(0, 0, String(defaultAttributes[i][0]))
+                .setInteractive()
+                .on('pointerdown', () => {
+                    console.log('attributeCircle ' + Attribute[i] + ' pressed');
+                    this.increaseAttribute(i as Attribute);
+                });
+            const attributeName: GameObjects.Text = this.add.text(0, 0, attributeNames[i])
                 .setOrigin(0)
                 .setStyle({ fontSize: 42 })
-            statName.setPosition(statCircle.x - statName.width * 0.5, statCircle.y + width * 0.05);
-            const statAmount = this.add.text(0, 0, String(defaultAttributes[i][1]), { fontSize: 56 })
+                .setInteractive()
+                .on('pointerdown', () => console.log('attributeName ' + Attribute[i] + ' pressed'));
+            attributeName.setPosition(attributeCircle.x - attributeName.width * 0.5, attributeCircle.y + width * 0.05);
+            const attributeAmount = this.add.text(0, 0, '0', { fontSize: 56 })
                 .setOrigin(0)
-            statAmount.setPosition(statCircle.x - statAmount.width * 0.5, statCircle.y - statAmount.height * 0.5);
-            singleAttributeContainer.add([statCircle, statName, statAmount]);
+            attributeAmount.setPosition(attributeCircle.x - attributeAmount.width * 0.5, attributeCircle.y - attributeAmount.height * 0.5);
+            singleAttributeContainer.add([attributeCircle, attributeName, attributeAmount]);
             allAttributesContainer.add(singleAttributeContainer);
+
+            this.attributeAmounts.push(attributeAmount);
+            this.attributeCircles.push(attributeCircle);
         }
         attributesSectionContainer.add(allAttributesContainer);
 
@@ -246,11 +275,11 @@ export class CharacterCreation extends Scene {
             .setInteractive()
             .on('pointerdown', () => {
                 this.showInfoOnInfoBox('Stats',
-                    `HP - Hit Points. Don't let these go to zero. Constitution increases HP and its recharge rate.\n
-MP - Mana Points. Spells use 5 or 10 or 15 mana. Scrolls are single use and use no mana. After that you have a chance to learn the used scroll spell. Spirit increases MP and its recharge rate.\n
-AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor can reduce the damage (min 1).`);
+                    `HP - Hit points. Your character will die. And running out of these will cause it. Constitution increases HP and its recharge rate and helps in Con saves.\n
+MP - Mana points. Spells use 5 or 10 or 15 mana. Scrolls are single use and use no mana. After that you have a chance to learn the used scroll spell. Spirit increases MP and its recharge rate.\n
+AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor can then reduce the damage (min 1).`);
             });
-        this.updateStatsOnStatsSection();
+        this.updateStatsSectionStats();
         statsSectionContainer.add([statsSectionOutline, this.statsSectionText])
             .setAlpha(0);
 
@@ -260,7 +289,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         y = height * 0.91;
 
         // Bottom text buttons for starting the game, randomizing everything or going back to menu.
-        const startGameButton: GameObjects.Text = this.add.text(x, y, 'Start Game')
+        this.startGameButton = this.add.text(x, y, 'Start Game')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
             .setAlpha(0)
@@ -294,6 +323,35 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         this.selectAncestry(selectableAncestries[0], this.ancestriesTexts, 0);
 
         Player.Instance.setAttributes(this.selectedAttributes);
+
+        this.setStartGameButtoInteractivity(false);
+    }
+
+    /** 
+     * Pressing attribute circle increases attribute.
+     * Attributes that go over 3 loop back to 0.
+     * 
+     * @param attribute What attribute to increase?
+     */
+    private increaseAttribute(attribute: Attribute): void {
+        console.log('increaseAttribute: ' + Attribute[attribute]);
+        const curNum: number = Number(this.attributeAmounts[attribute].text);
+        console.log('curNum' + curNum);
+
+        // Edge case for returning points when all points are used
+        if (this.remainingAttributePoints === 0 || curNum === 3) {
+            this.attributeAmounts[attribute].text = '0';
+            this.remainingAttributePoints += curNum;
+            this.selectedAttributes.setAttribute(attribute as Attribute, 0);
+            this.setStartGameButtoInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
+            return;
+        }
+
+        const newNum: number = curNum + 1;
+        this.remainingAttributePoints--;
+        this.selectedAttributes.setAttribute(attribute as Attribute, newNum);
+        this.attributeAmounts[attribute].text = newNum.toString();
+        this.setStartGameButtoInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
     }
 
     /** A d6 button component for use in randomizing character creation selections. */
@@ -326,12 +384,16 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         this.infoBoxContent.text = content;
     }
 
-    /** Updates stats (HP, MP, AC) on the bottom part of the screen. Takes class bonuses into consideration. */
-    private updateStatsOnStatsSection(): void {
-        this.currentHitPoints = this.baseHitPoints + this.selectedAttributes.constitution * this.hitPointsFromOneCon
+    /** 
+     * Updates stats (HP, MP, AC) on the bottom part of the screen. 
+     * Takes class bonuses into consideration. */
+    private updateStatsSectionStats(): void {
+        this.currentHitPoints = this.baseHitPoints
+            + this.selectedAttributes.constitution * this.hitPointsFromOneCon
             + (this.selectedAncestry === AncestryType.Dwarf ? 5 : 0);
 
-        this.currentMana = this.baseMana + this.selectedAttributes.spirit * this.manaFromOneSpi;
+        this.currentMana = this.baseMana
+            + this.selectedAttributes.spirit * this.manaFromOneSpi;
 
         this.currentAc = this.baseAc + this.selectedAttributes.dexterity
             + (this.selectedAncestry === AncestryType.Catfolk ? 2 : 0);
@@ -368,7 +430,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
                 attributes[to]--;
             }
 
-            if (i > 50 && i % 5 == 0) {
+            if (i >= 50 && i % 5 == 0) {
                 console.log('checking requirements');
                 if (this.selectedAncestry === AncestryType.Human) {
                     // 0 required stats so every combination is valid
@@ -433,8 +495,33 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         }
 
         this.selectedAttributes.saveIntArrayAsAttributes(attributes);
-        this.updateStatsOnStatsSection();
+        for (let i = 0; i < attributes.length; i++) {
+            this.attributeAmounts[i].text = attributes[i].toString();
+        }
+        // todo call processAttributeRings()
+        this.remainingAttributePoints = 0;
+        this.updateStatsSectionStats();
+        // At this point the only valid character requirement,
+        // valid attribute points are guaranteed.
+        this.setStartGameButtoInteractivity(true);
         console.log(this.selectedAttributes);
+    }
+
+    /** 
+     * Start game button is only usable when attribute points are correctly 
+     * set. Otherwise it is is unresponsive and looks that way.
+     * 
+     * @param interactive Should the button accept input and should it look such.
+     */
+    private setStartGameButtoInteractivity(interactive: boolean): void {
+        if (interactive) {
+            this.startGameButton.setInteractive();
+            this.startGameButton.setStyle({ ... this.startGameButton.style, color: '#fff' });
+        }
+        else {
+            this.startGameButton.disableInteractive();
+            this.startGameButton.setStyle({ ... this.startGameButton.style, color: '#666' });
+        }
     }
 
     /** 
@@ -467,7 +554,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
             options[i].setColor(i === index ? '#fff' : '#666');
         }
 
-        this.updateStatsOnStatsSection();
+        this.updateStatsSectionStats();
         Player.Instance.setAncestry(ancestry.name);
     }
 
@@ -479,7 +566,6 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
 
         this.selectAncestryCallbacks[Phaser.Math.Between(0, this.ancestriesTexts.length - 2)].call(this);
 
-        // todo randomize attributes
         this.onRandomizeAttributesClicked();
     }
 
