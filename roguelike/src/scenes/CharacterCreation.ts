@@ -182,10 +182,48 @@ export class CharacterCreation extends Scene {
         const nextSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, containerHeight)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
-        const nextSectionTitle: GameObjects.Text = this.add.text(textPadding, textPadding, 'Coming soon!')
+        const nextSectionTitle: GameObjects.Text = this.add.text(textPadding, textPadding, 'Name')
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
-        nextSectionContainer.add([nextSectionOutline, nextSectionTitle])
+        // Name input field.
+        // Editable text is done using rexui text edit.
+        const nameMaxLength: number = 10;
+        const nextSectionNameInputField: GameObjects.Text = this.add.text(textPadding, textPadding + em * 2, 'John')
+            .setStyle({ fontSize: em, width: em * 10, backgroundColor: '#333', align: 'center', fixedWidth: em * 7 })
+            .setInteractive()
+            .on('pointerdown', () => {
+                const currentName: string = nextSectionNameInputField.text;
+                this.rexUI.edit(
+                    nextSectionNameInputField,
+                    // Passing config arguments causes unexpected behaviour 
+                    // and the documentation is poor so it's better to not 
+                    // use advanced features at the moment.
+                    {},
+                    // On close callback
+                    () => {
+                        // In the case that the name was left empty, reuse last name.
+                        if (nextSectionNameInputField.text.length === 0) {
+                            nextSectionNameInputField.text = currentName;
+                        }
+                        else {
+                            nextSectionNameInputField.text = nextSectionNameInputField.text.substring(0, nameMaxLength);
+                            Player.Instance.setName(nextSectionNameInputField.text);
+                        }
+                    });
+            });
+        const nextSectionRandomizeDieButton = this.createD6Button(
+            nextSectionNameInputField.x + nextSectionNameInputField.width + em * 0.5,
+            nextSectionNameInputField.y * 0.9,
+            () => {
+                let randNames = ['Adam', 'Suzy', 'Hiro'];
+                nextSectionNameInputField.text = randNames[Phaser.Math.Between(0, randNames.length - 1)];
+                Player.Instance.setName(nextSectionNameInputField.text);
+            });
+        nextSectionContainer.add([
+            nextSectionOutline,
+            nextSectionTitle,
+            nextSectionNameInputField,
+            nextSectionRandomizeDieButton]);
 
         x += containerWidth + containerPadding;
         // Info box takes the remaining space on the right side.
@@ -333,7 +371,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
 
         // Start Game button is not clickable as no attributes are set.
         // If view begins with a randomized char this can be omitted.
-        this.setStartGameButtoInteractivity(false);
+        this.setStartGameButtonInteractivity(false);
     } //create
 
     /** 
@@ -352,7 +390,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
             this.attributeAmounts[attribute].text = '0';
             this.remainingAttributePoints += curNum;
             this.selectedAttributes.setAttribute(attribute as Attribute, 0);
-            this.setStartGameButtoInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
+            this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
             return;
         }
 
@@ -360,7 +398,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         this.remainingAttributePoints--;
         this.selectedAttributes.setAttribute(attribute as Attribute, newNum);
         this.attributeAmounts[attribute].text = newNum.toString();
-        this.setStartGameButtoInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
+        this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
     }
 
     /** A d6 button component for use in randomizing character creation selections. */
@@ -412,6 +450,8 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
 
     /** Randomize attributes while honoring ancestry requirements. */
     private onRandomizeAttributesClicked(): void {
+        console.log(this.onRandomizeAttributesClicked.name);
+
         let attributes: number[] = [1, 1, 1, 1, 1];
         const iStr = 0;
         const iDex = 1;
@@ -440,7 +480,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
             }
 
             if (i >= 50 && i % 5 == 0) {
-                console.log('checking requirements');
+                console.log('Checking if passes attribute requirements.');
                 if (this.selectedAncestry === AncestryType.Human) {
                     // 0 required stats so every combination is valid
                     break;
@@ -507,14 +547,14 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         for (let i = 0; i < attributes.length; i++) {
             this.attributeAmounts[i].text = attributes[i].toString();
         }
-        // todo call processAttributeRings()
         this.remainingAttributePoints = 0;
         this.updateStatsSectionStats();
         // At this point the only valid character requirement,
         // valid attribute points are guaranteed.
-        this.setStartGameButtoInteractivity(true);
+        this.setStartGameButtonInteractivity(true);
+
         console.log(this.selectedAttributes);
-    }
+    } //onRandomizeAttributesClicked
 
     /** 
      * Start game button is only usable when attribute points are correctly 
@@ -522,7 +562,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
      * 
      * @param interactive Should the button accept input and should it look such.
      */
-    private setStartGameButtoInteractivity(interactive: boolean): void {
+    private setStartGameButtonInteractivity(interactive: boolean): void {
         if (interactive) {
             this.startGameButton.setInteractive();
             this.startGameButton.setStyle({ ... this.startGameButton.style, color: '#fff' });
@@ -564,7 +604,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         }
 
         this.updateStatsSectionStats();
-        Player.Instance.setAncestry(ancestry.name);
+        Player.Instance.setAncestry(ancestry.type, ancestry.name);
     }
 
     // Bottom row button methods START GAME, RANDOMIZE EVERYTHING, BACK TO MENU
