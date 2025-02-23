@@ -13,20 +13,26 @@ import { Attribute } from '../enums/attribute';
 /** 
  * Character creation view.
  * 
- * Design: In this single page view (PC) you pick your Ancestry, Background, Stats 
- * and probably spells. You might also see what will be in your inventory and info
- * about the currently selected items through an info panel that is always on.
- * The player also selects or randomizes their name and age.
+ * Design: In this horizontal style single page view (PC layout) you pick your 
+ * Ancestry, Name, and Attributes. More things to be picked have been designed. 
+ * You also see info about the currently selected items through an info panel
+ * that is always on.
+ * 
+ * The view has unicode dies for randomization but otherwise buttons are just 
+ * regular text. The player can proceed after their attribute points pass 
+ * a ancestry requirements check.
  */
 export class CharacterCreation extends Scene {
     /** View title is at top middle of the screen. */
     private readonly screenName: string = 'Character Creation';
     /** A simple way to prevent buttons from firing multiple times. */
     private shouldProcessButtonPresses: boolean = true;
+    // Info box.
     /** Used to represent info about something in the screen. */
     private infoBoxContent: GameObjects.Text;
     /** Infobox title needs to be synced with @see infoBoxContent. */
     private infoBoxTitle: GameObjects.Text;
+    // Ancestries
     /** Saved so that randomization can pick a different ancestry every time. */
     private lastChosenAncestryIndex: number = 42;
     /** Store ancestry for checking if attribute requirement is fullfilled etc. */
@@ -44,8 +50,11 @@ export class CharacterCreation extends Scene {
      * @see onRandomizeEverythingButtonClicked uses it for randomization.
      */
     private selectAncestryCallbacks: { (): void }[] = [];
+    // Attributes, Str Dex Con
+    private attributesSectionTitle: GameObjects.Text;
     /** Player distributes 5 attribute points. */
     private selectedAttributes: Attributes = new Attributes();
+    // Stats, HP MP AC
     /** How much health the player has with 0 constitution. */
     private baseHitPoints: number = 25;
     /** Current hit points that are calculated from base and Con. */
@@ -211,11 +220,11 @@ export class CharacterCreation extends Scene {
                         }
                     });
             });
-        const nextSectionRandomizeDieButton = this.createD6Button(
+        const nextSectionRandomizeDieButton: GameObjects.Text = this.createD6Button(
             nextSectionNameInputField.x + nextSectionNameInputField.width + em * 0.5,
             nextSectionNameInputField.y * 0.9,
             () => {
-                let randNames = ['Adam', 'Suzy', 'Hiro'];
+                let randNames: string[] = ['Adam', 'Suzy', 'Hiro'];
                 nextSectionNameInputField.text = randNames[Phaser.Math.Between(0, randNames.length - 1)];
                 Player.Instance.setName(nextSectionNameInputField.text);
             });
@@ -257,15 +266,15 @@ export class CharacterCreation extends Scene {
         const attributesSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, containerHeight)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
-        const attributesSectionTitle = this.add.text(textPadding, textPadding, 'Attributes (5 remaining)')
+        this.attributesSectionTitle = this.add.text(textPadding, textPadding, 'Attributes (5 remaining)')
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         // Randomization happens by clicking a die.
-        const attributesSectionRandomizeDieButton = this.createD6Button(containerWidth - 1.9 * em, textPadding,
+        const attributesSectionRandomizeDieButton: GameObjects.Text = this.createD6Button(containerWidth - 1.9 * em, textPadding,
             () => this.onRandomizeAttributesClicked());
         attributesSectionContainer.add([
             attributesSectionOutline,
-            attributesSectionTitle,
+            this.attributesSectionTitle,
             attributesSectionRandomizeDieButton]);
 
         // Attribute circles, numbers and legend
@@ -273,6 +282,7 @@ export class CharacterCreation extends Scene {
         let attributeNames: string[] = ['Str', 'Dex', 'Con', 'Spi', 'Kno'];
         let attributesXOffset: number = width * 0.11;
         const allAttributesContainer: GameObjects.Container = this.add.container(em * 4, em * 5.5);
+        
         for (let i = 0; i < 5; i++) {
             const singleAttributeContainer: GameObjects.Container = this.add.container(i * attributesXOffset, 0);
             const attributeCircle: GameObjects.Arc = this.add.circle(0, 0, height * 0.07, 0x000000, 1)
@@ -288,7 +298,7 @@ export class CharacterCreation extends Scene {
                 .setInteractive()
                 .on('pointerdown', () => console.log('attributeName ' + Attribute[i] + ' pressed'));
             attributeName.setPosition(attributeCircle.x - attributeName.width * 0.5, attributeCircle.y + width * 0.05);
-            const attributeAmount = this.add.text(0, 0, '0', { fontSize: 56 })
+            const attributeAmount: GameObjects.Text = this.add.text(0, 0, '0', { fontSize: 56 })
                 .setOrigin(0)
             attributeAmount.setPosition(attributeCircle.x - attributeAmount.width * 0.5, attributeCircle.y - attributeAmount.height * 0.5);
             singleAttributeContainer.add([attributeCircle, attributeName, attributeAmount]);
@@ -391,6 +401,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
             this.remainingAttributePoints += curNum;
             this.selectedAttributes.setAttribute(attribute as Attribute, 0);
             this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
+            this.updateRemainingAttributePointsText();
             return;
         }
 
@@ -398,6 +409,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         this.remainingAttributePoints--;
         this.selectedAttributes.setAttribute(attribute as Attribute, newNum);
         this.attributeAmounts[attribute].text = newNum.toString();
+        this.updateRemainingAttributePointsText();
         this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
     }
 
@@ -452,24 +464,43 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
     private onRandomizeAttributesClicked(): void {
         console.log(this.onRandomizeAttributesClicked.name);
 
+        /** Attributes in array form for indexing & counting purposes. */
         let attributes: number[] = [1, 1, 1, 1, 1];
-        const iStr = 0;
-        const iDex = 1;
-        const iCon = 2;
-        const iSpi = 3;
-        const iKno = 4;
+        const iStr: number = 0;
+        const iDex: number = 1;
+        const iCon: number = 2;
+        const iSpi: number = 3;
+        const iKno: number = 4;
 
+        /** 
+         * A way to try to increase some attribute if the attribute
+         * is not high enough when this algo tries to finish.
+         * Does not always succeed but does not need to either.
+         */
         let overwriteTo: boolean = false;
+        /** 
+         * If increasing a primary attribute with {@see overwriteTo} this is
+         * the stat it tries to increase which corresponds to an attribute.
+         */
         let statToIncrease: number = 0;
 
+        // Main loop of the randomization algo which tries to stop at 50, 55,
+        // and so on randomizations.
         for (let i = 0; i < 300; i++) {
+            // Attribute to take from
             let from = Phaser.Math.Between(0, 4);
+            // Attribute to increase
             let to = (from + Phaser.Math.Between(0, 3)) % 5;
+
+            // If trying to wrap up the randomization & increase a primary 
+            // attribute to is overwritten. Works most of the time, 3 or 4 
+            // times out of 5.
             if (overwriteTo) {
                 overwriteTo = false;
                 to = statToIncrease;
             }
 
+            // Check if swap is valid.
             if (attributes[to] < 3 && attributes[from] > 0) {
                 attributes[to]++;
                 attributes[from]--;
@@ -479,6 +510,11 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
                 attributes[to]--;
             }
 
+            // As seen here the current iteration does not always do anything,
+            // but across many iterations it does its job.
+
+            // Try to exit after some randomizations have been done
+            // but validate the results.
             if (i >= 50 && i % 5 == 0) {
                 console.log('Checking if passes attribute requirements.');
                 if (this.selectedAncestry === AncestryType.Human) {
@@ -505,7 +541,8 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
                     // For dwarves we aim just to increase Con since 
                     // it's the dominant stat and enables caster archetype.
 
-                    const combined = attributes[iCon] + attributes[iStr] + attributes[iSpi] + attributes[iKno];
+                    const combined = attributes[iCon] + attributes[iStr]
+                        + attributes[iSpi] + attributes[iKno];
 
                     if (attributes[iCon] === 0) {
                         overwriteTo = true;
@@ -517,7 +554,8 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
                     }
                 }
                 else if (this.selectedAncestry === AncestryType.Gnome) {
-                    const combined = attributes[iKno] + attributes[iCon] + attributes[iDex];
+                    const combined = attributes[iKno] + attributes[iCon]
+                        + attributes[iDex];
 
                     if (attributes[iKno] === 0) {
                         overwriteTo = true;
@@ -529,7 +567,8 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
                     }
                 }
                 else if (this.selectedAncestry === AncestryType.HouseElf) {
-                    const combined = attributes[iSpi] + attributes[iDex] + attributes[iKno];
+                    const combined = attributes[iSpi] + attributes[iDex]
+                        + attributes[iKno];
 
                     if (attributes[iSpi] === 0) {
                         overwriteTo = true;
@@ -547,14 +586,23 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         for (let i = 0; i < attributes.length; i++) {
             this.attributeAmounts[i].text = attributes[i].toString();
         }
+        
         this.remainingAttributePoints = 0;
+        this.updateRemainingAttributePointsText();
+
         this.updateStatsSectionStats();
+
         // At this point the only valid character requirement,
         // valid attribute points are guaranteed.
         this.setStartGameButtonInteractivity(true);
 
         console.log(this.selectedAttributes);
     } //onRandomizeAttributesClicked
+
+    /** Updates the text: 'Attributes (n remaining)' where n is between 0-5. */
+    private updateRemainingAttributePointsText(): void {
+        this.attributesSectionTitle.text = `Attributes (${this.remainingAttributePoints} remaining)`;
+    }
 
     /** 
      * Start game button is only usable when attribute points are correctly 
