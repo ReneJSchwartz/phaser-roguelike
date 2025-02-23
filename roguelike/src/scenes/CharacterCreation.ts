@@ -92,7 +92,8 @@ export class CharacterCreation extends Scene {
     }
 
     /** 
-     * Makes UI elements to the screen. 
+     * Makes UI elements to the screen and controls how they work
+     * by placing proper input listener callbacks. 
      * These are title, outlined containers, and some buttons.
      * Also fades the view in. 
      */
@@ -100,8 +101,10 @@ export class CharacterCreation extends Scene {
         this.shouldProcessButtonPresses = true;
 
         const { width, height } = this.scale;
-        /** Font y-size. */
-        const em: number = 28
+
+        // Layout paddings & sizing tools
+        /** Font y-size. Used to make paddings for text or other elements. */
+        const em: number = 28;
         /** Padding for text next to and inside section/container borders. */
         const textPadding: number = em * 0.5;
         /** Padding that sections have in relation to each other. */
@@ -121,8 +124,6 @@ export class CharacterCreation extends Scene {
             stroke: '#000000', strokeThickness: 6, align: 'center'
         })
             .setOrigin(0.5)
-            // Each element is set to alpha 0 so they don't flash on fade in.
-            .setAlpha(0);
 
         // Different containerized selection or other sections make up the view
         // Row 1
@@ -170,7 +171,6 @@ export class CharacterCreation extends Scene {
         const ancestrySectionRandomizeDieButton = this.createD6Button(containerWidth - 1.9 * em, textPadding,
             () => this.selectAncestry(Ancestries.random, this.ancestriesTexts, selectableAncestries.length - 1));
         ancestrySectionContainer.add([ancestryBoxOutline, ancestrySectionTitle, ancestrySectionRandomizeDieButton])
-            .setAlpha(0);
 
         // X starting point comes from old container's width + starting point.
         x += containerWidth + containerPadding;
@@ -186,15 +186,13 @@ export class CharacterCreation extends Scene {
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         nextSectionContainer.add([nextSectionOutline, nextSectionTitle])
-            .setAlpha(0);
 
         x += containerWidth + containerPadding;
         // Info box takes the remaining space on the right side.
         containerWidth = width - x - screenEdgesLRPadding;
 
         // Info box provides info on what is currently selected (e.g. Ancestry description).
-        const infoBoxSectionContainer: GameObjects.Container = this.add.container(x, y)
-            .setAlpha(0);
+        const infoBoxSectionContainer: GameObjects.Container = this.add.container(x, y);
         // Custom height as this is not "on the grid" so to speak, it is just on the first row.
         const infoBoxOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, height * 0.8)
             .setOrigin(0)
@@ -205,7 +203,10 @@ export class CharacterCreation extends Scene {
         this.infoBoxContent = this.add.text(textPadding, em * 2.5, Ancestries.catfolk.description)
             .setOrigin(0, 0)
             .setStyle({ fontSize: 28, wordWrap: { width: width * 0.3 } });
-        infoBoxSectionContainer.add([infoBoxOutline, this.infoBoxTitle, this.infoBoxContent]);
+        infoBoxSectionContainer.add([
+            infoBoxOutline,
+            this.infoBoxTitle,
+            this.infoBoxContent]);
 
         // Row 2
         x = screenEdgesLRPadding;
@@ -224,8 +225,10 @@ export class CharacterCreation extends Scene {
         // Randomization happens by clicking a die.
         const attributesSectionRandomizeDieButton = this.createD6Button(containerWidth - 1.9 * em, textPadding,
             () => this.onRandomizeAttributesClicked());
-        attributesSectionContainer.add([attributesSectionOutline, attributesSectionTitle, attributesSectionRandomizeDieButton])
-            .setAlpha(0);
+        attributesSectionContainer.add([
+            attributesSectionOutline,
+            attributesSectionTitle,
+            attributesSectionRandomizeDieButton]);
 
         // Attribute circles, numbers and legend
         // Clicking these will increase the attribute amount or reset it back to 0.
@@ -280,11 +283,11 @@ MP - Mana points. Spells use 5 or 10 or 15 mana. Scrolls are single use and use 
 AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor can then reduce the damage (min 1).`);
             });
         this.updateStatsSectionStats();
-        statsSectionContainer.add([statsSectionOutline, this.statsSectionText])
-            .setAlpha(0);
+        statsSectionContainer.add([statsSectionOutline, this.statsSectionText]);
 
+        // Bottom of the screen buttons
 
-        // Bottom of the screen: not subject to sections/containers but rather free form.
+        // Layout is not subject to sections/containers but is rather free form.
         x = width * 0.06;
         y = height * 0.91;
 
@@ -292,7 +295,6 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         this.startGameButton = this.add.text(x, y, 'Start Game')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
-            .setAlpha(0)
             .setInteractive()
             .on('pointerdown', () => { this.onFinishCharacterCreationAndStartNewGameButtonClicked(); });
 
@@ -301,7 +303,6 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         const randomizeEverythingButton: GameObjects.Text = this.add.text(x, y, 'Randomize All')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
-            .setAlpha(0)
             .setInteractive()
             .on('pointerdown', () => { this.onRandomizeEverythingButtonClicked(); });
 
@@ -310,22 +311,30 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         const backToMenuButton: GameObjects.Text = this.add.text(x, y, 'Back To Menu')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
-            .setAlpha(0)
             .setInteractive()
             .on('pointerdown', () => { this.onBackToMenuButtonClicked(); });
 
+        // Other functionality
+
         // On start screen fades into view.
+        // Set alphas to 0 to prevent flashing on fade in.
+        this.children.list.filter(x => x instanceof GameObjects.Container || x instanceof GameObjects.Text)
+            .forEach(x => x.setAlpha(0));
+
+        // Then bring everything into view.
         this.tweens.add({
             targets: this.children.list,
             alpha: 1,
         });
 
+        // Selects first ancestry from the list at start (human).
         this.selectAncestry(selectableAncestries[0], this.ancestriesTexts, 0);
-
         Player.Instance.setAttributes(this.selectedAttributes);
 
+        // Start Game button is not clickable as no attributes are set.
+        // If view begins with a randomized char this can be omitted.
         this.setStartGameButtoInteractivity(false);
-    }
+    } //create
 
     /** 
      * Pressing attribute circle increases attribute.
