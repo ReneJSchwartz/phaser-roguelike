@@ -52,6 +52,6 @@ export class PressAnyKey extends Scene {
             duration: 250,
         })
 
-        this.time.delayedCall(550, () => this.scene.start(MainMenu.name));
+        this.time.delayedCall(550, () => this.scene.start('MainMenu'));
     }
 }

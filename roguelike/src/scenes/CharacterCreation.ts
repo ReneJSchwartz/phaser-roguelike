@@ -720,6 +720,6 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
             })
         });
 
-        this.time.delayedCall(550, () => this.scene.start(Game.name));
+        this.time.delayedCall(550, () => this.scene.start('Game'));
     }
 }

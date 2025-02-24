@@ -1,5 +1,4 @@
 import { GameObjects, Scene } from 'phaser';
-import { PressAnyKey } from './PressAnyKey';
 import i18next from 'i18next';
 import { LocalizationId } from '../enums/localization-id';
 import { Localization } from '../config/localization';
@@ -53,7 +52,7 @@ export class Preloader extends Scene {
         // Due to low amount of assets these will be kept in memory for now.
 
         this.load.setPath('assets');
-        this.load.image('logo', 'logo.png');
+        this.load.image('phaser-logo', 'phaser-logo.png');
 
         // UI & Main Menu
         this.load.image('ui-border-1', 'panel-border-009.png');
@@ -63,7 +62,7 @@ export class Preloader extends Scene {
         // TODO Camera fade between scenes.
 
         this.time.delayedCall(this.fullyLoadedLingerTimeMs, () => {
-            this.scene.start(PressAnyKey.name)
+            this.scene.start('PressAnyKey');
         });
     }
 }

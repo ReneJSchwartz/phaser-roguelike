@@ -140,7 +140,7 @@ export class MainMenu extends Scene {
             })
         });
 
-        this.time.delayedCall(550, () => this.scene.start(CharacterCreation.name));
+        this.time.delayedCall(550, () => this.scene.start('CharacterCreation'));
 
         this.buttonsExitTween();
     }

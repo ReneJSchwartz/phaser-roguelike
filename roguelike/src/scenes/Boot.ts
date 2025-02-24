@@ -18,7 +18,7 @@ export class Boot extends Scene {
     create() {
         this.cameras.main.setBackgroundColor(0x302d2d);
 
-        this.scene.start(Preloader.name);
-        this.scene.launch(ScreenBackgroundColor.name);
+        this.scene.start('Preloader');
+        this.scene.launch('ScreenBackgroundColor');
     }
 }
