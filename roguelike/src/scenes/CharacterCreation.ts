@@ -340,12 +340,12 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         y = height * 0.91;
 
         // Bottom text buttons for starting the game, randomizing everything or going back to menu.
-        
+
         this.startGameButton = this.add.text(x, y, 'Start Game')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
             .setInteractive()
-            .on('pointerdown', () => { this.onFinishCharacterCreationAndStartNewGameButtonClicked(); });
+            .on('pointerdown', () => this.onFinishCharacterCreationAndStartNewGameButtonClicked());
 
         x += width * 0.18;
 
@@ -354,7 +354,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
             .setInteractive()
-            .on('pointerdown', () => { this.onRandomizeEverythingButtonClicked(); });
+            .on('pointerdown', () => this.onRandomizeEverythingButtonClicked());
 
         x += width * 0.20;
 
@@ -369,7 +369,8 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
 
         // On start screen fades into view.
         // Set alphas to 0 to prevent flashing on fade in.
-        this.children.list.filter(x => x instanceof GameObjects.Container || x instanceof GameObjects.Text)
+        this.children.list.filter(x => x instanceof GameObjects.Container
+            || x instanceof GameObjects.Text)
             .forEach(x => x.setAlpha(0));
 
         // Then bring everything into view.
@@ -394,31 +395,36 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
      * @param attribute What attribute to increase?
      */
     private increaseAttribute(attribute: Attribute): void {
-        console.log(CharacterCreation.name + ' increaseAttribute: ' + Attribute[attribute]);
+        console.log(CharacterCreation.name + ' increaseAttribute: '
+            + Attribute[attribute]);
 
-        const curNum: number = Number(this.attributeAmounts[attribute].text);
+        const curAttributeNum: number = Number(this.attributeAmounts[attribute].text);
 
-        // Edge case for returning points when all points are used
-        if (this.remainingAttributePoints === 0 || curNum === 3) {
+        // Edge case for returning 1-3 points when all points are used
+        if (this.remainingAttributePoints === 0 || curAttributeNum === 3) {
             this.attributeAmounts[attribute].text = '0';
-            this.remainingAttributePoints += curNum;
+            this.remainingAttributePoints += curAttributeNum;
             this.selectedAttributes.setAttribute(attribute as Attribute, 0);
-            this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
+            this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(
+                this.selectedAncestry, this.selectedAttributes));
             this.updateRemainingAttributePointsText();
+
             return;
         }
 
-        const newNum: number = curNum + 1;
+        const newAttributeNum: number = curAttributeNum + 1;
         this.remainingAttributePoints--;
-        this.selectedAttributes.setAttribute(attribute as Attribute, newNum);
-        this.attributeAmounts[attribute].text = newNum.toString();
+        this.selectedAttributes.setAttribute(attribute as Attribute, newAttributeNum);
+        this.attributeAmounts[attribute].text = newAttributeNum.toString();
         this.updateRemainingAttributePointsText();
-        this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(this.selectedAncestry, this.selectedAttributes));
+        this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(
+            this.selectedAncestry, this.selectedAttributes));
     }
 
     /** A d6 button component for use in randomizing character creation selections. */
     private createD6Button(x: number, y: number, lambda: { (): void }): GameObjects.Text {
-        const dieButton: GameObjects.Text = this.add.text(x, y, this.d6Faces[Phaser.Math.Between(1, 6)])
+        const dieButton: GameObjects.Text = this.add.text(x, y,
+            this.d6Faces[Phaser.Math.Between(1, 6)])
             .setOrigin(0)
             .setStyle({ fontSize: 48 })
             .setInteractive()

@@ -3,6 +3,8 @@ import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { CharacterCreation } from './CharacterCreation';
 import { GameManager } from '../game-manager';
 import { StyleConfig } from '../config/style-config';
+import i18next from 'i18next';
+import { LocalizationId } from '../enums/localization-id';
 
 /** 
  * Main menu view. 
@@ -14,8 +16,6 @@ export class MainMenu extends Scene {
      * beginning of the scene.
      */
     private gameTitle: GameObjects.Text;
-    /** Game name placeholder. The game is a roguelike game. */
-    private readonly gameName: string = 'Like Rogue RL';
     /** A simple way to prevent buttons from firing multiple times. */
     private shouldProcessButtonPresses: boolean = false;
 
@@ -33,7 +33,7 @@ export class MainMenu extends Scene {
 
         // Title
         this.gameTitle = this.add.text(width * 0.5, height * 0.2,
-            this.gameName, StyleConfig.gameTitleStyle)
+            i18next.t(LocalizationId.GameTitle), StyleConfig.gameTitleStyle)
             .setOrigin(0.5)
             .setAlpha(0);
         // Title entrance

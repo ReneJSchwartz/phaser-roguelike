@@ -2,6 +2,9 @@ import { Scene } from 'phaser';
 import { MainMenu } from './MainMenu';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { StyleConfig } from '../config/style-config';
+import i18next from 'i18next';
+import { LocalizationId } from '../enums/localization-id';
+import { Localization } from '../config/localization';
 
 /**
  * Press any key screen that accepts input from mouse of keyboard to progress
@@ -20,8 +23,9 @@ export class PressAnyKey extends Scene {
     create() {
         const { width, height } = this.scale;
 
+        /** Grab prompt text from localization plugin {@link Localization}. */
         this.pressAnyKeyToContinueText = this.add.text(
-            width / 2, height * 0.9, 'Press Any Key To Continue',
+            width / 2, height * 0.9, i18next.t(LocalizationId.PressAnyKey),
             StyleConfig.pressAnyKeyPromptStyle)
             .setOrigin(0.5);
 
