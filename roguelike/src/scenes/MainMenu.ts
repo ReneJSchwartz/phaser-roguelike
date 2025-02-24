@@ -41,8 +41,8 @@ export class MainMenu extends Scene {
             targets: this.gameTitle,
             alpha: 1,
             ease: 'cubic.in',
-            duration: 2000,
-            delay: 500
+            duration: 1000,
+            // delay: 500
         });
 
         // Main Menu's main buttons: 
@@ -62,7 +62,7 @@ export class MainMenu extends Scene {
             .on('pointerdown', () => { this.onStartNewGameButtonClicked(); })
             .on('pointerover', () => newGameButtonContainer.scale = 1.07)
             .on('pointerout', () => newGameButtonContainer.scale = 1);
-        const newGameButtonText = this.add.text(0, 0, 'New Game')
+        const newGameButtonText = this.add.text(0, 0, i18next.t(LocalizationId.ButtonNewGame))
             .setOrigin(0.5)
             .setStyle({ fontSize: 38 });
         newGameButtonContainer.add([newGameButtonImage, newGameButtonText])
@@ -77,7 +77,7 @@ export class MainMenu extends Scene {
             .on('pointerdown', () => console.log("Quit Game"))
             .on('pointerover', () => quitGameButtonContainer.scale = 1.07)
             .on('pointerout', () => quitGameButtonContainer.scale = 1);
-        const quitGameButtonText = this.add.text(0, 0, 'Quit Game')
+        const quitGameButtonText = this.add.text(0, 0, i18next.t(LocalizationId.ButtonQuitGame))
             .setOrigin(0.5)
             .setStyle({ fontSize: 38 });
         quitGameButtonContainer.add([quitGameButtonImage, quitGameButtonText])
@@ -92,7 +92,7 @@ export class MainMenu extends Scene {
             targets: targets,
             x: position,
             ease: 'cubic.out',
-            duration: 2000,
+            duration: 1000,
             onComplete: () => { this.shouldProcessButtonPresses = true; },
             delay: 500,
         });
@@ -100,7 +100,7 @@ export class MainMenu extends Scene {
             targets: targets,
             alpha: { from: 0, to: 1 },
             ease: 'cubic.in',
-            duration: 2000,
+            duration: 1000,
             delay: 500
         });
     }

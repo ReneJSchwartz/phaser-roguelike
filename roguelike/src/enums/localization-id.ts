@@ -12,4 +12,8 @@ export enum LocalizationId {
     PressAnyKey = "Press any key",
     // In main Menu
     GameTitle = "Game Title",
+    ButtonNewGame = "New Game",
+    ButtonQuitGame = "Quit Game",
+    // In Character Creation screen
+    
 }

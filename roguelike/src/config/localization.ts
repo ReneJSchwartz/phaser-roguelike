@@ -22,6 +22,10 @@ export class Localization {
                             "Press Any Key To Continue",
                         [LocalizationId.GameTitle]:
                             "Rrogue",
+                        [LocalizationId.ButtonNewGame]:
+                            "New Game",
+                        [LocalizationId.ButtonQuitGame]:
+                            "Quit Game",
                     }
                 }
             }
