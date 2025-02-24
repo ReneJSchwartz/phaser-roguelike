@@ -9,6 +9,7 @@ import { MainMenu } from './MainMenu';
 import { Player } from '../entities/player';
 import { Attributes } from '../character-creation/attributes';
 import { Attribute } from '../enums/attribute';
+import { StyleConfig } from '../config/style-config';
 
 /** 
  * Character creation view.
@@ -127,11 +128,7 @@ export class CharacterCreation extends Scene {
         const firstContainerTopPadding: number = height * 0.1;
 
         // View title
-        this.add.text(width * 0.5, height * 0.05,
-            this.screenName, {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 6, align: 'center'
-        })
+        this.add.text(width * 0.5, height * 0.05, this.screenName, StyleConfig.characterCreationTitleStyle)
             .setOrigin(0.5)
 
         // Different containerized selection or other sections make up the view
@@ -166,7 +163,10 @@ export class CharacterCreation extends Scene {
             Ancestries.gnome];
         this.ancestriesTexts = [];
         for (let index = 0; index < selectableAncestries.length; index++) {
-            const t = this.add.text(textPadding, em * 2 + index * em, '  ' + selectableAncestries[index].name)
+            const t = this.add.text(textPadding, em * 2 + index * em,
+                // Add extra space, later some kind of ui indicator arrow 
+                // might move there (for consoles, arrow keys & space/enter).
+                '  ' + selectableAncestries[index].name)
                 .setOrigin(0, 0)
                 .setStyle({ fontSize: 28 })
                 .setInteractive()
@@ -282,7 +282,7 @@ export class CharacterCreation extends Scene {
         let attributeNames: string[] = ['Str', 'Dex', 'Con', 'Spi', 'Kno'];
         let attributesXOffset: number = width * 0.11;
         const allAttributesContainer: GameObjects.Container = this.add.container(em * 4, em * 5.5);
-        
+
         for (let i = 0; i < 5; i++) {
             const singleAttributeContainer: GameObjects.Container = this.add.container(i * attributesXOffset, 0);
             const attributeCircle: GameObjects.Arc = this.add.circle(0, 0, height * 0.07, 0x000000, 1)
@@ -391,9 +391,9 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
      * @param attribute What attribute to increase?
      */
     private increaseAttribute(attribute: Attribute): void {
-        console.log('increaseAttribute: ' + Attribute[attribute]);
+        console.log(CharacterCreation.name + ' increaseAttribute: ' + Attribute[attribute]);
+
         const curNum: number = Number(this.attributeAmounts[attribute].text);
-        console.log('curNum' + curNum);
 
         // Edge case for returning points when all points are used
         if (this.remainingAttributePoints === 0 || curNum === 3) {
@@ -445,7 +445,8 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
 
     /** 
      * Updates stats (HP, MP, AC) on the bottom part of the screen. 
-     * Takes class bonuses into consideration. */
+     * Takes class bonuses into consideration.
+     */
     private updateStatsSectionStats(): void {
         this.currentHitPoints = this.baseHitPoints
             + this.selectedAttributes.constitution * this.hitPointsFromOneCon
@@ -488,9 +489,9 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         // and so on randomizations.
         for (let i = 0; i < 300; i++) {
             // Attribute to take from
-            let from = Phaser.Math.Between(0, 4);
-            // Attribute to increase
-            let to = (from + Phaser.Math.Between(0, 3)) % 5;
+            const from: number = Phaser.Math.Between(0, 4);
+            // Attribute to increase, might be overwritten
+            let to: number = (from + Phaser.Math.Between(0, 3)) % 5;
 
             // If trying to wrap up the randomization & increase a primary 
             // attribute to is overwritten. Works most of the time, 3 or 4 
@@ -500,7 +501,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
                 to = statToIncrease;
             }
 
-            // Check if swap is valid.
+            // Check if swap or reverse swap is valid.
             if (attributes[to] < 3 && attributes[from] > 0) {
                 attributes[to]++;
                 attributes[from]--;
@@ -586,7 +587,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         for (let i = 0; i < attributes.length; i++) {
             this.attributeAmounts[i].text = attributes[i].toString();
         }
-        
+
         this.remainingAttributePoints = 0;
         this.updateRemainingAttributePointsText();
 
@@ -613,11 +614,11 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
     private setStartGameButtonInteractivity(interactive: boolean): void {
         if (interactive) {
             this.startGameButton.setInteractive();
-            this.startGameButton.setStyle({ ... this.startGameButton.style, color: '#fff' });
+            this.startGameButton.setStyle({ ... this.startGameButton.style, color: StyleConfig.buttonColorEnabled });
         }
         else {
             this.startGameButton.disableInteractive();
-            this.startGameButton.setStyle({ ... this.startGameButton.style, color: '#666' });
+            this.startGameButton.setStyle({ ... this.startGameButton.style, color: StyleConfig.buttonColorDisabled });
         }
     }
 

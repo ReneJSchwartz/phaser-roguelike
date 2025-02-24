@@ -1,8 +1,8 @@
 import { Scene, GameObjects } from 'phaser';
-import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { CharacterCreation } from './CharacterCreation';
 import { GameManager } from '../game-manager';
+import { StyleConfig } from '../config/style-config';
 
 /** 
  * Main menu view. 
@@ -33,10 +33,7 @@ export class MainMenu extends Scene {
 
         // Title
         this.gameTitle = this.add.text(width * 0.5, height * 0.2,
-            this.gameName, {
-            fontFamily: 'Arial Black', fontSize: 44, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 6, align: 'center'
-        })
+            this.gameName, StyleConfig.gameTitleStyle)
             .setOrigin(0.5)
             .setAlpha(0);
         // Title entrance
