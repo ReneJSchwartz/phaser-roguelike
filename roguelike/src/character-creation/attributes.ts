@@ -85,9 +85,7 @@ export class Attributes {
                     && attributes.spirit + attributes.knowledge
                     + attributes.knowledge >= 2;
             case AncestryType.Human:
-                return attributes.strength + attributes.dexterity +
-                    attributes.constitution + attributes.spirit
-                    + attributes.knowledge === 5;
+                return true;
             default:
                 return false;
         }

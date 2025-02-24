@@ -4,6 +4,7 @@ import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { StyleConfig } from '../config/style-config';
 import i18next from 'i18next';
 import { LocalizationId } from '../enums/localization-id';
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- It is used. */
 import { Localization } from '../config/localization';
 
 /**

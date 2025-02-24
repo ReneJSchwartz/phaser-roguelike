@@ -4,6 +4,8 @@ import { AncestryType } from "../enums/ancestry-type";
 /** 
  * The main player script that holds data about the player but PlayerController
  * will be a separate script. 
+ * 
+ * Stub until game logic has been designed & diagrammed.
  */
 export class Player {
     /** Ancestry as a string presentation. */

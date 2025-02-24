@@ -3,6 +3,8 @@ import { Player } from "./entities/player";
 
 /** 
  * Processes general game logic with the help of other classes.
+ * 
+ * Stub until game logic has been designed & diagrammed.
  * */
 export class GameManager {
     /** Level generator. */
