@@ -35,26 +35,34 @@ export class Player {
 
     /** Sets player's ancestry. */
     public setAncestry(ancestryType: AncestryType, ancestryName: string): void {
-        console.log(Player.name, this.setAncestry.name, arguments[0]);
+        /* eslint-disable-next-line prefer-rest-params -- Don't think this rule applies here. */
+        console.log(Player.name, this.setAncestry.name, ...arguments);
+        
         this.ancestryName = ancestryName;
         this.ancestryType = ancestryType;
     }
 
     /** Sets max hitpoints for the player. Does not heal the player. */
     public setMaxHitPoints(amount: number): void {
-        console.log(Player.name, this.setMaxHitPoints.name, arguments[0]);
+        /* eslint-disable-next-line prefer-rest-params -- Don't think this rule applies here. */
+        console.log(Player.name, this.setMaxHitPoints.name, ...arguments);
+
         this.maxHitPoints = amount;
     }
 
     /** Sets player's attributes. */
     public setAttributes(attributes: Attributes) {
-        console.log(Player.name, this.setAttributes.name, arguments[0]);
+        /* eslint-disable-next-line prefer-rest-params -- Don't think this rule applies here. */
+        console.log(Player.name, this.setAttributes.name, ...arguments);
+
         this.attributes = attributes;
     }
 
     /** Sets player's name. */
     public setName(name: string) {
-        console.log(Player.name, this.setName.name, arguments[0]);
+        /* eslint-disable-next-line prefer-rest-params -- Don't think this rule applies here. */
+        console.log(Player.name, this.setName.name, ...arguments);
+
         this.name = name;
     }
 }

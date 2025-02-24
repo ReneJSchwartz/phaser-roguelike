@@ -173,7 +173,7 @@ export class CharacterCreation extends Scene {
                 .on('pointerdown', () => this.selectAncestry(selectableAncestries[index], this.ancestriesTexts, index));
             this.ancestriesTexts.push(t);
             // Button onClick callbacks are not callable by reference to the button in Phaser.
-            let func = () => { this.selectAncestry(selectableAncestries[index], this.ancestriesTexts, index) }
+            const func = () => { this.selectAncestry(selectableAncestries[index], this.ancestriesTexts, index) }
             this.selectAncestryCallbacks.push(func);
             ancestrySectionContainer.add(t);
         }
@@ -224,7 +224,7 @@ export class CharacterCreation extends Scene {
             nextSectionNameInputField.x + nextSectionNameInputField.width + em * 0.5,
             nextSectionNameInputField.y * 0.9,
             () => {
-                let randNames: string[] = ['Adam', 'Suzy', 'Hiro'];
+                const randNames: string[] = ['Adam', 'Suzy', 'Hiro'];
                 nextSectionNameInputField.text = randNames[Phaser.Math.Between(0, randNames.length - 1)];
                 Player.Instance.setName(nextSectionNameInputField.text);
             });
@@ -279,8 +279,8 @@ export class CharacterCreation extends Scene {
 
         // Attribute circles, numbers and legend
         // Clicking these will increase the attribute amount or reset it back to 0.
-        let attributeNames: string[] = ['Str', 'Dex', 'Con', 'Spi', 'Kno'];
-        let attributesXOffset: number = width * 0.11;
+        const attributeNames: string[] = ['Str', 'Dex', 'Con', 'Spi', 'Kno'];
+        const attributesXOffset: number = width * 0.11;
         const allAttributesContainer: GameObjects.Container = this.add.container(em * 4, em * 5.5);
 
         for (let i = 0; i < 5; i++) {
@@ -340,6 +340,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         y = height * 0.91;
 
         // Bottom text buttons for starting the game, randomizing everything or going back to menu.
+        
         this.startGameButton = this.add.text(x, y, 'Start Game')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
@@ -348,7 +349,8 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
 
         x += width * 0.18;
 
-        const randomizeEverythingButton: GameObjects.Text = this.add.text(x, y, 'Randomize All')
+        // randomizeEverythingButton: GameObjects.Text
+        this.add.text(x, y, 'Randomize All')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
             .setInteractive()
@@ -356,7 +358,8 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
 
         x += width * 0.20;
 
-        const backToMenuButton: GameObjects.Text = this.add.text(x, y, 'Back To Menu')
+        // backToMenuButton: GameObjects.Text
+        this.add.text(x, y, 'Back To Menu')
             .setOrigin(0)
             .setStyle({ fontSize: 32 })
             .setInteractive()
@@ -466,7 +469,7 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         console.log(this.onRandomizeAttributesClicked.name);
 
         /** Attributes in array form for indexing & counting purposes. */
-        let attributes: number[] = [1, 1, 1, 1, 1];
+        const attributes: number[] = [1, 1, 1, 1, 1];
         const iStr: number = 0;
         const iDex: number = 1;
         const iCon: number = 2;

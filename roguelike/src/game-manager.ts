@@ -24,5 +24,6 @@ export class GameManager {
         console.log('Game started on GameManager.');
         this.levelGen = new LevelGenerator();
         console.log('level:\n' + this.levelGen.generateLevel().join('\n'));
+        console.log(Player.Instance);
     }
 }

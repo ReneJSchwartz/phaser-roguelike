@@ -29,7 +29,7 @@ export class LevelGenerator {
 
     /** Used to test the room spawning. */
     private spawnRoomTest(): string[][] {
-        let retVal: string[][] = [[]];
+        const retVal: string[][] = [[]];
         retVal[0] = "#######".split('');
         retVal.push("#B....#".split(''));
         retVal.push("#...###".split(''));
