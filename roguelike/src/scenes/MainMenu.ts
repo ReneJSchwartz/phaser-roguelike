@@ -25,7 +25,8 @@ export class MainMenu extends Scene {
     /** Creates main menu UI and initializes GameManager. */
     create() {
         // Initialize game systems after player has proceeded 
-        // from press any button.
+        // from press any button scene and wants to play with the game
+        // with their chosen input device.
         new GameManager();
 
         const { width, height } = this.scale;
@@ -38,7 +39,7 @@ export class MainMenu extends Scene {
         // Title entrance
         this.add.tween({
             targets: this.gameTitle,
-            alpha: 1,
+            alpha: { to: 1, from: 0 },
             ease: 'cubic.in',
             duration: 1000,
         });
@@ -58,8 +59,32 @@ export class MainMenu extends Scene {
             .setSize(width * 0.3, 0)
             .setInteractive()
             .on('pointerdown', () => { this.onStartNewGameButtonClicked(); })
-            .on('pointerover', () => newGameButtonContainer.scale = 1.07)
-            .on('pointerout', () => newGameButtonContainer.scale = 1);
+            .on('pointerover', () => {
+                if (this.shouldProcessButtonPresses === false) {
+                    return;
+                }
+
+                this.tweens.killTweensOf(newGameButtonContainer);
+                this.tweens.add({
+                    targets: newGameButtonContainer,
+                    scale: { from: newGameButtonContainer.scale, to: 1.07 },
+                    // Duration of 0 hides the button as tween of duration 0 is bugged
+                    // with some versions of Phaser
+                    duration: 2000 * Math.max(0.01, (1.07 - newGameButtonContainer.scale))
+                });
+            })
+            .on('pointerout', () => {
+                if (this.shouldProcessButtonPresses === false) {
+                    return;
+                }
+
+                this.tweens.killTweensOf(newGameButtonContainer);
+                this.tweens.add({
+                    targets: newGameButtonContainer,
+                    scale: { from: newGameButtonContainer.scale, to: 1 },
+                    duration: 2000 * Math.max(0.01, (newGameButtonContainer.scale - 1))
+                });
+            });
         const newGameButtonText = this.add.text(0, 0, i18next.t(LocalizationId.ButtonNewGame))
             .setOrigin(0.5)
             .setStyle({ fontSize: 38 });
@@ -68,19 +93,49 @@ export class MainMenu extends Scene {
 
         // Quit Game Button
         const quitGameButtonContainer = this.add.container(width * 1.5, height * 0.65);
+        quitGameButtonContainer.name = 'quitGameButtonContainer';
         const quitGameButtonImage = this.add.nineslice(0, 0,
             'ui-border-1', 0, 96, 0, 20, 20)
             .setSize(width * 0.3, 0)
             .setInteractive()
             .on('pointerdown', () => console.log("Quit Game"))
-            .on('pointerover', () => quitGameButtonContainer.scale = 1.07)
-            .on('pointerout', () => quitGameButtonContainer.scale = 1);
+            .on('pointerover', () => {
+                if (this.shouldProcessButtonPresses === false) {
+                    return;
+                }
+
+                this.tweens.killTweensOf(quitGameButtonContainer);
+                this.tweens.add({
+                    targets: quitGameButtonContainer,
+                    scale: { from: quitGameButtonContainer.scale, to: 1.07 },
+                    duration: 2000 * Math.max(0.01, (1.07 - quitGameButtonContainer.scale))
+                });
+            })
+            .on('pointerout', () => {
+                if (this.shouldProcessButtonPresses === false) {
+                    return;
+                }
+
+                this.tweens.killTweensOf(quitGameButtonContainer);
+                this.tweens.add({
+                    targets: quitGameButtonContainer,
+                    scale: { from: quitGameButtonContainer.scale, to: 1 },
+                    duration: 2000 * Math.max(0.01, (quitGameButtonContainer.scale - 1))
+                });
+            });
         const quitGameButtonText = this.add.text(0, 0, i18next.t(LocalizationId.ButtonQuitGame))
             .setOrigin(0.5)
             .setStyle({ fontSize: 38 });
         quitGameButtonContainer.add([quitGameButtonImage, quitGameButtonText])
             .setAlpha(0);
 
+        const versionText: GameObjects.Text = this.add.text(0, height, 'Game version 0.0.2', StyleConfig.gameVersionStyle)
+            .setOrigin(0, 0)
+            .setAlpha(0);
+        versionText.setPosition(versionText.height * 0.5, height - versionText.height * 1.5);
+        this.tweens.add({ targets: versionText, alpha: 1, delay: 1000 });
+
+        // Other  functionality
         this.buttonsEntranceTweens([quitGameButtonContainer, newGameButtonContainer], width * 0.87);
     }
 

@@ -13,7 +13,13 @@ export abstract class StyleConfig {
     // Main Menu
     /** Style for Main Menu's game title. */
     public static gameTitleStyle: Phaser.Types.GameObjects.Text.TextStyle = {
-        fontFamily: 'Arial Black', fontSize: 44, color: '#ffffff',
+        fontFamily: 'Arial Black', fontSize: 72, color: '#ffffff',
+        stroke: '#000000', strokeThickness: 2, align: 'center'
+    };
+
+    /** Game version shows a text such as Rrogue v0.0.2 */
+    public static gameVersionStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+        fontFamily: 'Arial Black', fontSize: 20, color: '#ffffff',
         stroke: '#000000', strokeThickness: 6, align: 'center'
     };
 
