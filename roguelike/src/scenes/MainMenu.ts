@@ -1,6 +1,5 @@
 import { Scene, GameObjects } from 'phaser';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
-import { CharacterCreation } from './CharacterCreation';
 import { GameManager } from '../game-manager';
 import { StyleConfig } from '../config/style-config';
 import i18next from 'i18next';
@@ -42,7 +41,6 @@ export class MainMenu extends Scene {
             alpha: 1,
             ease: 'cubic.in',
             duration: 1000,
-            // delay: 500
         });
 
         // Main Menu's main buttons: 

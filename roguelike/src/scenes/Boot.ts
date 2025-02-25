@@ -1,6 +1,4 @@
 import { Scene } from 'phaser';
-import { Preloader } from './Preloader';
-import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 
 /** 
  * First scene of the game. 

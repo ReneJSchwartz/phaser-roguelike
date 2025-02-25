@@ -1,11 +1,9 @@
 import { Scene, GameObjects } from 'phaser';
-import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { Ancestries } from '../character-creation/ancestries';
 import { Ancestry } from '../character-creation/ancestry';
 import { AncestryType } from '../enums/ancestry-type';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
-import { MainMenu } from './MainMenu';
 import { Player } from '../entities/player';
 import { Attributes } from '../character-creation/attributes';
 import { Attribute } from '../enums/attribute';
@@ -94,10 +92,9 @@ export class CharacterCreation extends Scene {
     /** 
      * Start game button needs to be only enabled when user has a valid 
      * character meaning one that has correctly set up attribute points.
+     * Its style is changed when it is enabled/disabled.
      */
     private startGameButton: GameObjects.Text;
-
-
 
     constructor() {
         super('CharacterCreation');
@@ -472,7 +469,7 @@ export class CharacterCreation extends Scene {
         this.currentAc = this.baseAc + this.selectedAttributes.dexterity
             + (this.selectedAncestry === AncestryType.Catfolk ? 2 : 0);
 
-        this.statsSectionText.text = `Stats:    HP: ${this.currentHitPoints}    MP: ${this.currentMana.toString().padEnd(2, ' ')}    AC: ${this.currentAc}`;
+        this.statsSectionText.text = `${i18next.t(LocalizationId.Stats)}:    HP: ${this.currentHitPoints}    MP: ${this.currentMana.toString().padEnd(2, ' ')}    AC: ${this.currentAc}`;
     }
 
     /** Randomize attributes while honoring ancestry requirements. */
@@ -707,7 +704,7 @@ export class CharacterCreation extends Scene {
             })
         });
 
-        this.time.delayedCall(550, () => this.scene.start(MainMenu.name));
+        this.time.delayedCall(550, () => this.scene.start('MainMenu'));
     }
 
     /** Starts a new game with the selected character settings and initiates visual effects. */

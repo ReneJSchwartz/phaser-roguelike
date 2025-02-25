@@ -1,5 +1,4 @@
 import { Scene } from 'phaser';
-import { MainMenu } from './MainMenu';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { StyleConfig } from '../config/style-config';
 import i18next from 'i18next';
