@@ -1,6 +1,11 @@
 import { Scene } from 'phaser';
 import { MainMenu } from './MainMenu';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
+import { StyleConfig } from '../config/style-config';
+import i18next from 'i18next';
+import { LocalizationId } from '../enums/localization-id';
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- It is used. */
+import { Localization } from '../config/localization';
 
 /**
  * Press any key screen that accepts input from mouse of keyboard to progress
@@ -15,15 +20,15 @@ export class PressAnyKey extends Scene {
         super('PressAnyKey');
     }
 
+    /** Adds prompt and input listener for loading menu scene. */
     create() {
         const { width, height } = this.scale;
 
+        /** Grab prompt text from localization plugin {@link Localization}. */
         this.pressAnyKeyToContinueText = this.add.text(
-            width / 2, height * 0.9, 'Press Any Key To Continue', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5);
+            width / 2, height * 0.9, i18next.t(LocalizationId.PressAnyKey),
+            StyleConfig.pressAnyKeyPromptStyle)
+            .setOrigin(0.5);
 
         this.input.once('pointerdown', () => {
             this.loadMainMenu();
@@ -47,6 +52,6 @@ export class PressAnyKey extends Scene {
             duration: 250,
         })
 
-        this.time.delayedCall(550, () => this.scene.start(MainMenu.name));
+        this.time.delayedCall(550, () => this.scene.start('MainMenu'));
     }
 }

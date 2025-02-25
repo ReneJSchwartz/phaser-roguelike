@@ -20,11 +20,18 @@
         "build-nolog": "vite build --config vite/config.prod.mjs"
     },
     "devDependencies": {
+        "@eslint/js": "^9.21.0",
+        "eslint": "^9.21.0",
         "terser": "^5.31.0",
         "typescript": "^5.4.5",
+        "typescript-eslint": "^8.24.1",
         "vite": "^5.3.1"
     },
     "dependencies": {
-        "phaser": "^3.87.0"
+        "i18next": "^24.2.2",
+        "i18next-http-backend": "^3.0.2",
+        "i18next-icu": "^2.3.0",
+        "phaser": "^3.87.0",
+        "phaser3-rex-plugins": "^1.80.13"
     }
 }

@@ -1,5 +1,7 @@
 import { GameObjects, Scene } from 'phaser';
-import { PressAnyKey } from './PressAnyKey';
+import i18next from 'i18next';
+import { LocalizationId } from '../enums/localization-id';
+import { Localization } from '../config/localization';
 
 /** 
  * Preloads assets to global persistent cache to be used later.
@@ -20,11 +22,14 @@ export class Preloader extends Scene {
     }
 
     init() {
+        // This is the first screen to use localization.
+        new Localization();
+
         const { width, height } = this.scale;
 
         // Outline of progress bar.
         this.add.rectangle(width / 2, height / 2, 468, 32)
-        .setStrokeStyle(1, 0xffffff);
+            .setStrokeStyle(1, 0xffffff);
         // Progress bar fill.
         const bar = this.add.rectangle(width / 2 - 468 / 2 + 4, height / 2, 4, 28, 0xffffff);
 
@@ -35,10 +40,11 @@ export class Preloader extends Scene {
         }).setOrigin(0.5);
 
         // Advance bar & text
+        const loadingPrefix: string = i18next.t(LocalizationId.LoadingPrefix);
         this.load.on('progress', (progress: number) => {
             // Min width + remaining as percentage of remaining width
             bar.width = 4 + (460 * progress);
-            this.loadingText.text = "Loading  " + (progress * 100) + " %";
+            this.loadingText.text = loadingPrefix + (progress * 100) + " %";
         });
     }
 
@@ -46,7 +52,7 @@ export class Preloader extends Scene {
         // Due to low amount of assets these will be kept in memory for now.
 
         this.load.setPath('assets');
-        this.load.image('logo', 'logo.png');
+        this.load.image('phaser-logo', 'phaser-logo.png');
 
         // UI & Main Menu
         this.load.image('ui-border-1', 'panel-border-009.png');
@@ -56,7 +62,7 @@ export class Preloader extends Scene {
         // TODO Camera fade between scenes.
 
         this.time.delayedCall(this.fullyLoadedLingerTimeMs, () => {
-            this.scene.start(PressAnyKey.name)
+            this.scene.start('PressAnyKey');
         });
     }
 }

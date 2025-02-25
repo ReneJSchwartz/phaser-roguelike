@@ -1,7 +1,7 @@
 /** 
  * Used to make ASCII roguelike levels that fit the game. 
  * For now this is largely a placeholder until more sophisticated
- * algorithms are written.
+ * algorithms are written and designed.
  * 
  * Levels consist of base/ground layer which doesn't change on it's own
  * and items and monsters and temporary environmental effects that are placed 
@@ -29,7 +29,7 @@ export class LevelGenerator {
 
     /** Used to test the room spawning. */
     private spawnRoomTest(): string[][] {
-        let retVal: string[][] = [[]];
+        const retVal: string[][] = [[]];
         retVal[0] = "#######".split('');
         retVal.push("#B....#".split(''));
         retVal.push("#...###".split(''));

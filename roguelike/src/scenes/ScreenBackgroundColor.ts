@@ -46,7 +46,9 @@ export class ScreenBackgroundColor extends Scene {
     /** Background color at its whitest phase when bgColorTween is on. */
     private readonly bgColorBlack: string = '#070707';
     /** Background color at its whitest phase during briefWhiteFlash tween. */
-    private readonly bgColorGray: string = '#151515';
+    private readonly bgColorGray: string = '#111';
+    /** Should the breathing effect be used at all? */
+    private readonly useBreathingEffect: boolean = false;
 
 
     constructor() {
@@ -60,7 +62,9 @@ export class ScreenBackgroundColor extends Scene {
     /** Starts color changing effect. */
     create() {
         ScreenBackgroundColor.instance = this;
-        this.startBreathingTween();
+        if (this.useBreathingEffect) {
+            this.startBreathingTween();
+        }
     }
 
     /** 
@@ -82,6 +86,7 @@ export class ScreenBackgroundColor extends Scene {
             alpha: 0,
             red: this.redLevel,
             duration: this.baseDurationMs,
+            ease: Phaser.Math.Easing.Circular.InOut,
             yoyo: true,
             repeat: -1,
             onUpdate: () => {
@@ -104,7 +109,11 @@ export class ScreenBackgroundColor extends Scene {
             targets: this.cameras.main.backgroundColor,
             alpha: 0,
             duration: 1000,
-            onComplete: () => { this.startBreathingTween(); }
+            onComplete: () => {
+                if (this.useBreathingEffect) {
+                    this.startBreathingTween();
+                }
+            }
         });
     }
 
@@ -117,7 +126,11 @@ export class ScreenBackgroundColor extends Scene {
             targets: this.cameras.main.backgroundColor,
             alpha: 0,
             duration: 1000,
-            onComplete: () => { this.startBreathingTween(); }
+            onComplete: () => {
+                if (this.useBreathingEffect) {
+                    this.startBreathingTween();
+                }
+            }
         });
     }
 }

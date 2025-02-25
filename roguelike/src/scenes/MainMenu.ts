@@ -1,7 +1,10 @@
 import { Scene, GameObjects } from 'phaser';
-import { Game } from './Game';
 import { ScreenBackgroundColor } from './ScreenBackgroundColor';
 import { CharacterCreation } from './CharacterCreation';
+import { GameManager } from '../game-manager';
+import { StyleConfig } from '../config/style-config';
+import i18next from 'i18next';
+import { LocalizationId } from '../enums/localization-id';
 
 /** 
  * Main menu view. 
@@ -13,24 +16,24 @@ export class MainMenu extends Scene {
      * beginning of the scene.
      */
     private gameTitle: GameObjects.Text;
-    /** Game name placeholder. The game is a roguelike game. */
-    private readonly gameName: string = 'Like Rogue RL';
     /** A simple way to prevent buttons from firing multiple times. */
-    private shouldProcessButtonPresses: boolean = true;
+    private shouldProcessButtonPresses: boolean = false;
 
     constructor() {
         super('MainMenu');
     }
 
+    /** Creates main menu UI and initializes GameManager. */
     create() {
+        // Initialize game systems after player has proceeded 
+        // from press any button.
+        new GameManager();
+
         const { width, height } = this.scale;
 
         // Title
         this.gameTitle = this.add.text(width * 0.5, height * 0.2,
-            this.gameName, {
-            fontFamily: 'Arial Black', fontSize: 44, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 6, align: 'center'
-        })
+            i18next.t(LocalizationId.GameTitle), StyleConfig.gameTitleStyle)
             .setOrigin(0.5)
             .setAlpha(0);
         // Title entrance
@@ -38,8 +41,8 @@ export class MainMenu extends Scene {
             targets: this.gameTitle,
             alpha: 1,
             ease: 'cubic.in',
-            duration: 2000,
-            delay: 500
+            duration: 1000,
+            // delay: 500
         });
 
         // Main Menu's main buttons: 
@@ -56,13 +59,10 @@ export class MainMenu extends Scene {
             'ui-border-1', 0, 96, 0, 20, 20)
             .setSize(width * 0.3, 0)
             .setInteractive()
-            .on('pointerdown', () => {
-                this.onStartNewGameButtonClicked();
-                this.buttonsExitTween();
-            })
+            .on('pointerdown', () => { this.onStartNewGameButtonClicked(); })
             .on('pointerover', () => newGameButtonContainer.scale = 1.07)
             .on('pointerout', () => newGameButtonContainer.scale = 1);
-        const newGameButtonText = this.add.text(0, 0, 'New Game')
+        const newGameButtonText = this.add.text(0, 0, i18next.t(LocalizationId.ButtonNewGame))
             .setOrigin(0.5)
             .setStyle({ fontSize: 38 });
         newGameButtonContainer.add([newGameButtonImage, newGameButtonText])
@@ -77,7 +77,7 @@ export class MainMenu extends Scene {
             .on('pointerdown', () => console.log("Quit Game"))
             .on('pointerover', () => quitGameButtonContainer.scale = 1.07)
             .on('pointerout', () => quitGameButtonContainer.scale = 1);
-        const quitGameButtonText = this.add.text(0, 0, 'Quit Game')
+        const quitGameButtonText = this.add.text(0, 0, i18next.t(LocalizationId.ButtonQuitGame))
             .setOrigin(0.5)
             .setStyle({ fontSize: 38 });
         quitGameButtonContainer.add([quitGameButtonImage, quitGameButtonText])
@@ -92,15 +92,15 @@ export class MainMenu extends Scene {
             targets: targets,
             x: position,
             ease: 'cubic.out',
-            duration: 2000,
-            onComplete: () => {  },
+            duration: 1000,
+            onComplete: () => { this.shouldProcessButtonPresses = true; },
             delay: 500,
         });
         this.add.tween({
             targets: targets,
             alpha: { from: 0, to: 1 },
             ease: 'cubic.in',
-            duration: 2000,
+            duration: 1000,
             delay: 500
         });
     }
@@ -140,6 +140,8 @@ export class MainMenu extends Scene {
             })
         });
 
-        this.time.delayedCall(550, () => this.scene.start(CharacterCreation.name));
+        this.time.delayedCall(550, () => this.scene.start('CharacterCreation'));
+
+        this.buttonsExitTween();
     }
 }
