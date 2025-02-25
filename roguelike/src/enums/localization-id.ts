@@ -15,5 +15,8 @@ export enum LocalizationId {
     ButtonNewGame = "New Game",
     ButtonQuitGame = "Quit Game",
     // In Character Creation screen
-    
+    CharacterCreationTitle = "Character Creation",
+    Ancestry = "Ancestry",
+    Stats = "Stats",
+    InfoStats = "Info Stats"
 }

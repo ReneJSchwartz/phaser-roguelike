@@ -24,13 +24,44 @@ export abstract class StyleConfig {
         stroke: '#000000', strokeThickness: 6, align: 'center'
     };
 
+    // Color Palette
+    // Colors can come in 3 strengths. The main color is the light one since 
+    // our background is so dark. The dark variation can be used for 
+    // disable buttons and the bright one if we're trying to guide 
+    // players attention to somewhere.
+    // Turns out colours don't work very well on this style of game
+    // that also tries to poorly emulate a old terminal and/or simplistic 
+    // shape drawing library.
+
+    private static lightBlue: string = '#4b70f5';
+    private static attentionBlue: string = '#3dc2ec';
+    private static darkBLue: string = '#4A358DFF';
+
     // General UI styles
 
     /** 
      * Color of buttons that are clickable. Might need to change these
-     * to TextStyles for additional effects.
+     * to TextStyles for additional effects. 
      */
-    public static buttonColorEnabled: string = '#fff';
+    public static buttonColorEnabled: string = '#ffffff';
     /** Color of buttons that are not clickable. */
-    public static buttonColorDisabled: string = '#666';
+    public static buttonColorDisabled: string = '#999';
+    /** Used for buttons we want the user to notice and click. */
+    public static buttonColorEnabledAndGrabAttention: string = '#ffffff';
+
+    public static buttonShadowEnabled: Phaser.Types.GameObjects.Text.TextShadow = {
+        offsetX: 1, offsetY: 1,
+        color: StyleConfig.lightBlue,
+        stroke: true
+    };
+
+    public static buttonShadowDisabled: Phaser.Types.GameObjects.Text.TextShadow = {
+        stroke: false, fill: false
+    };
+
+    public static buttonShadowEnabledAndGrabAttention: Phaser.Types.GameObjects.Text.TextShadow = {
+        offsetX: 1, offsetY: 1,
+        color: StyleConfig.lightBlue,
+        stroke: true, fill: true
+    };
 }

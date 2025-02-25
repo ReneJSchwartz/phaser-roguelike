@@ -10,6 +10,8 @@ import { Player } from '../entities/player';
 import { Attributes } from '../character-creation/attributes';
 import { Attribute } from '../enums/attribute';
 import { StyleConfig } from '../config/style-config';
+import i18next from 'i18next';
+import { LocalizationId } from '../enums/localization-id';
 
 /** 
  * Character creation view.
@@ -108,7 +110,9 @@ export class CharacterCreation extends Scene {
      * Also fades the view in. 
      */
     create() {
+        // Reset variables to avoid bugs on scene re-entry.
         this.shouldProcessButtonPresses = true;
+        this.attributeAmounts = [];
 
         const { width, height } = this.scale;
 
@@ -320,15 +324,12 @@ export class CharacterCreation extends Scene {
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
         this.statsSectionText = this.add.text(textPadding, textPadding,
-            `Stats:    HP: ${25}    MP: ${5}    AC: ${5}`)
+            `${i18next.t(LocalizationId.Stats)}:    HP: ${25}    MP: ${5}    AC: ${5}`)
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 })
             .setInteractive()
             .on('pointerdown', () => {
-                this.showInfoOnInfoBox('Stats',
-                    `HP - Hit points. Your character will die. And running out of these will cause it. Constitution increases HP and its recharge rate and helps in Con saves.\n
-MP - Mana points. Spells use 5 or 10 or 15 mana. Scrolls are single use and use no mana. After that you have a chance to learn the used scroll spell. Spirit increases MP and its recharge rate.\n
-AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor can then reduce the damage (min 1).`);
+                this.showInfoOnInfoBox(i18next.t(LocalizationId.Stats), i18next.t(LocalizationId.InfoStats))
             });
         this.updateStatsSectionStats();
         statsSectionContainer.add([statsSectionOutline, this.statsSectionText]);
@@ -343,16 +344,18 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
 
         this.startGameButton = this.add.text(x, y, 'Start Game')
             .setOrigin(0)
-            .setStyle({ fontSize: 32 })
-            .setInteractive()
+            .setStyle({ fontSize: 32, color: 'white', stroke: 'black', strokeThickness: 2 })
             .on('pointerdown', () => this.onFinishCharacterCreationAndStartNewGameButtonClicked());
+        this.setStartGameButtonInteractivity(false);
 
         x += width * 0.18;
 
         // randomizeEverythingButton: GameObjects.Text
         this.add.text(x, y, 'Randomize All')
             .setOrigin(0)
-            .setStyle({ fontSize: 32 })
+            .setStyle({
+                fontSize: 32, color: 'white', stroke: 'black', strokeThickness: 2
+            })
             .setInteractive()
             .on('pointerdown', () => this.onRandomizeEverythingButtonClicked());
 
@@ -361,7 +364,9 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
         // backToMenuButton: GameObjects.Text
         this.add.text(x, y, 'Back To Menu')
             .setOrigin(0)
-            .setStyle({ fontSize: 32 })
+            .setStyle({
+                fontSize: 32, color: 'white', stroke: 'black', strokeThickness: 2
+            })
             .setInteractive()
             .on('pointerdown', () => { this.onBackToMenuButtonClicked(); });
 
@@ -623,11 +628,17 @@ AC - Armor class. Enemies need to roll this on 20 sided die to hit you. Armor ca
     private setStartGameButtonInteractivity(interactive: boolean): void {
         if (interactive) {
             this.startGameButton.setInteractive();
-            this.startGameButton.setStyle({ ... this.startGameButton.style, color: StyleConfig.buttonColorEnabled });
+            this.startGameButton.setStyle({
+                ... this.startGameButton.style,
+                color: StyleConfig.buttonColorEnabled
+            });
         }
         else {
             this.startGameButton.disableInteractive();
-            this.startGameButton.setStyle({ ... this.startGameButton.style, color: StyleConfig.buttonColorDisabled });
+            this.startGameButton.setStyle({
+                ... this.startGameButton.style,
+                color: StyleConfig.buttonColorDisabled
+            });
         }
     }
 
