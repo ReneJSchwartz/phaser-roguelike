@@ -63,7 +63,7 @@ export class CharacterCreation extends Scene {
     /** How much HP investing 1 attribute point to Con gives. */
     private hitPointsFromOneCon: number = 5;
     /** How much mana the player has with 0 Spirit. */
-    private baseMana: number = 5;
+    private baseMana: number = 10;
     /** How much mana the player has with stat and race bonuses. */
     private currentMana: number = this.baseMana;
     /** How much MP investing 1 attribute point to Spi gives. */
@@ -411,6 +411,7 @@ export class CharacterCreation extends Scene {
             this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(
                 this.selectedAncestry, this.selectedAttributes));
             this.updateRemainingAttributePointsText();
+            this.updateStatsSectionStats();
 
             return;
         }
