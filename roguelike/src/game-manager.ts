@@ -1,3 +1,4 @@
+import { Ancestries } from "./character-creation/ancestries";
 import { LevelGenerator } from "./dungeon-utils/level-generator";
 import { Player } from "./entities/player";
 
@@ -19,6 +20,7 @@ export class GameManager {
     constructor() {
         GameManager.Instance = this;
         new Player();
+        new Ancestries();
     }
 
     /** Starts game after making a character. */

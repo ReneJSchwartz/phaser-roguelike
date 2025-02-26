@@ -24,8 +24,6 @@ import { LocalizationId } from '../enums/localization-id';
  * a ancestry requirements check.
  */
 export class CharacterCreation extends Scene {
-    /** View title is at top middle of the screen. */
-    private readonly screenName: string = 'Character Creation';
     /** A simple way to prevent buttons from firing multiple times. */
     private shouldProcessButtonPresses: boolean = true;
     // Info box.
@@ -130,7 +128,9 @@ export class CharacterCreation extends Scene {
         const firstContainerTopPadding: number = height * 0.1;
 
         // View title
-        this.add.text(width * 0.5, height * 0.05, this.screenName, StyleConfig.characterCreationTitleStyle)
+        this.add.text(width * 0.5, height * 0.05,
+            i18next.t(LocalizationId.CharacterCreationTitle),
+            StyleConfig.characterCreationTitleStyle)
             .setOrigin(0.5)
 
         // Different containerized selection or other sections make up the view
@@ -149,11 +149,14 @@ export class CharacterCreation extends Scene {
         let containerHeight: number = height * 0.26;
 
         // Ancestry is the first thing on top left
-        const ancestrySectionContainer: GameObjects.Container = this.add.container(x, y);
-        const ancestryBoxOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, containerHeight)
+        const ancestrySectionContainer: GameObjects.Container =
+            this.add.container(x, y);
+        const ancestryBoxOutline: GameObjects.Rectangle = this.add.rectangle(
+            0, 0, containerWidth, containerHeight)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
-        const ancestrySectionTitle: GameObjects.Text = this.add.text(textPadding, textPadding, 'Ancestry')
+        const ancestrySectionTitle: GameObjects.Text = this.add.text(
+            textPadding, textPadding, i18next.t(LocalizationId.Ancestry))
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         // Make ancestries list.
@@ -189,39 +192,46 @@ export class CharacterCreation extends Scene {
         containerWidth = width * 0.42;
 
         // Next section can be for backgrounds or inventory or spells or starting equipment
-        const nextSectionContainer: GameObjects.Container = this.add.container(x, y);
-        const nextSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, containerHeight)
-            .setOrigin(0)
-            .setStrokeStyle(1, 0xffffff);
-        const nextSectionTitle: GameObjects.Text = this.add.text(textPadding, textPadding, 'Name')
-            .setOrigin(0, 0)
-            .setStyle({ fontSize: 32 });
+        const nextSectionContainer: GameObjects.Container =
+            this.add.container(x, y);
+        const nextSectionOutline: GameObjects.Rectangle =
+            this.add.rectangle(0, 0, containerWidth, containerHeight)
+                .setOrigin(0)
+                .setStrokeStyle(1, 0xffffff);
+        const nextSectionTitle: GameObjects.Text =
+            this.add.text(textPadding, textPadding, i18next.t(LocalizationId.Name))
+                .setOrigin(0, 0)
+                .setStyle({ fontSize: 32 });
         // Name input field.
         // Editable text is done using rexui text edit.
         const nameMaxLength: number = 10;
-        const nextSectionNameInputField: GameObjects.Text = this.add.text(textPadding, textPadding + em * 2, 'John')
-            .setStyle({ fontSize: em, width: em * 10, backgroundColor: '#333', align: 'center', fixedWidth: em * 7 })
-            .setInteractive()
-            .on('pointerdown', () => {
-                const currentName: string = nextSectionNameInputField.text;
-                this.rexUI.edit(
-                    nextSectionNameInputField,
-                    // Passing config arguments causes unexpected behaviour 
-                    // and the documentation is poor so it's better to not 
-                    // use advanced features at the moment.
-                    {},
-                    // On close callback
-                    () => {
-                        // In the case that the name was left empty, reuse last name.
-                        if (nextSectionNameInputField.text.length === 0) {
-                            nextSectionNameInputField.text = currentName;
-                        }
-                        else {
-                            nextSectionNameInputField.text = nextSectionNameInputField.text.substring(0, nameMaxLength);
-                            Player.Instance.setName(nextSectionNameInputField.text);
-                        }
-                    });
-            });
+        const nextSectionNameInputField: GameObjects.Text =
+            this.add.text(textPadding, textPadding + em * 2, 'John')
+                .setStyle({
+                    fontSize: em, width: em * 10, backgroundColor: '#333',
+                    align: 'center', fixedWidth: em * 7
+                })
+                .setInteractive()
+                .on('pointerdown', () => {
+                    const currentName: string = nextSectionNameInputField.text;
+                    this.rexUI.edit(
+                        nextSectionNameInputField,
+                        // Passing config arguments causes unexpected behaviour 
+                        // and the documentation is poor so it's better to not 
+                        // use advanced features at the moment.
+                        {},
+                        // On close callback
+                        () => {
+                            // In the case that the name was left empty, reuse last name.
+                            if (nextSectionNameInputField.text.length === 0) {
+                                nextSectionNameInputField.text = currentName;
+                            }
+                            else {
+                                nextSectionNameInputField.text = nextSectionNameInputField.text.substring(0, nameMaxLength);
+                                Player.Instance.setName(nextSectionNameInputField.text);
+                            }
+                        });
+                });
         const nextSectionRandomizeDieButton: GameObjects.Text = this.createD6Button(
             nextSectionNameInputField.x + nextSectionNameInputField.width + em * 0.5,
             nextSectionNameInputField.y * 0.9,
@@ -241,11 +251,13 @@ export class CharacterCreation extends Scene {
         containerWidth = width - x - screenEdgesLRPadding;
 
         // Info box provides info on what is currently selected (e.g. Ancestry description).
-        const infoBoxSectionContainer: GameObjects.Container = this.add.container(x, y);
+        const infoBoxSectionContainer: GameObjects.Container =
+            this.add.container(x, y);
         // Custom height as this is not "on the grid" so to speak, it is just on the first row.
-        const infoBoxOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, height * 0.8)
-            .setOrigin(0)
-            .setStrokeStyle(1, 0xffffff);
+        const infoBoxOutline: GameObjects.Rectangle =
+            this.add.rectangle(0, 0, containerWidth, height * 0.8)
+                .setOrigin(0)
+                .setStrokeStyle(1, 0xffffff);
         this.infoBoxTitle = this.add.text(textPadding, textPadding, 'Info - Human')
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
@@ -340,31 +352,27 @@ export class CharacterCreation extends Scene {
 
         // Bottom text buttons for starting the game, randomizing everything or going back to menu.
 
-        this.startGameButton = this.add.text(x, y, 'Start Game')
+        this.startGameButton = this.add.text(x, y, i18next.t(LocalizationId.ButtonStartGame))
             .setOrigin(0)
-            .setStyle({ fontSize: 32, color: 'white', stroke: 'black', strokeThickness: 2 })
+            .setStyle(StyleConfig.bottomRowButtonStyle)
             .on('pointerdown', () => this.onFinishCharacterCreationAndStartNewGameButtonClicked());
         this.setStartGameButtonInteractivity(false);
 
         x += width * 0.18;
 
         // randomizeEverythingButton: GameObjects.Text
-        this.add.text(x, y, 'Randomize All')
+        this.add.text(x, y, i18next.t(LocalizationId.ButtonRandomizeAll))
             .setOrigin(0)
-            .setStyle({
-                fontSize: 32, color: 'white', stroke: 'black', strokeThickness: 2
-            })
+            .setStyle(StyleConfig.bottomRowButtonStyle)
             .setInteractive()
             .on('pointerdown', () => this.onRandomizeEverythingButtonClicked());
 
         x += width * 0.20;
 
         // backToMenuButton: GameObjects.Text
-        this.add.text(x, y, 'Back To Menu')
+        this.add.text(x, y, i18next.t(LocalizationId.ButtonBackToMenu))
             .setOrigin(0)
-            .setStyle({
-                fontSize: 32, color: 'white', stroke: 'black', strokeThickness: 2
-            })
+            .setStyle(StyleConfig.bottomRowButtonStyle)
             .setInteractive()
             .on('pointerdown', () => { this.onBackToMenuButtonClicked(); });
 
@@ -616,7 +624,9 @@ export class CharacterCreation extends Scene {
 
     /** Updates the text: 'Attributes (n remaining)' where n is between 0-5. */
     private updateRemainingAttributePointsText(): void {
-        this.attributesSectionTitle.text = `Attributes (${this.remainingAttributePoints} remaining)`;
+        this.attributesSectionTitle.text = i18next.t(
+            LocalizationId.AttributesXRemaining,
+            { numAttributes: this.remainingAttributePoints });
     }
 
     /** 

@@ -30,6 +30,10 @@ export abstract class StyleConfig {
         stroke: '#000000', strokeThickness: 6, align: 'center'
     };
 
+    public static bottomRowButtonStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+        fontSize: 32, color: 'white', stroke: 'black', strokeThickness: 2
+    };
+
     // Color Palette
     // Colors can come in 3 strengths. The main color is the light one since 
     // our background is so dark. The dark variation can be used for 
