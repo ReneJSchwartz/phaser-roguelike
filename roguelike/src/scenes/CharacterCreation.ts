@@ -110,6 +110,7 @@ export class CharacterCreation extends Scene {
         // Reset variables to avoid bugs on scene re-entry.
         this.shouldProcessButtonPresses = true;
         this.attributeAmounts = [];
+        this.remainingAttributePoints = 5;
 
         const { width, height } = this.scale;
 
@@ -419,6 +420,7 @@ export class CharacterCreation extends Scene {
         this.selectedAttributes.setAttribute(attribute as Attribute, newAttributeNum);
         this.attributeAmounts[attribute].text = newAttributeNum.toString();
         this.updateRemainingAttributePointsText();
+        this.updateStatsSectionStats();
         this.setStartGameButtonInteractivity(Attributes.isValidAttributesForAncestry(
             this.selectedAncestry, this.selectedAttributes));
     }

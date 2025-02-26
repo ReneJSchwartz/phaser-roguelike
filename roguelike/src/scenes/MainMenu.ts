@@ -129,7 +129,7 @@ export class MainMenu extends Scene {
         quitGameButtonContainer.add([quitGameButtonImage, quitGameButtonText])
             .setAlpha(0);
 
-        const versionText: GameObjects.Text = this.add.text(0, height, 'Game version 0.0.2', StyleConfig.gameVersionStyle)
+        const versionText: GameObjects.Text = this.add.text(0, height, 'Game version 0.0.3', StyleConfig.gameVersionStyle)
             .setOrigin(0, 0)
             .setAlpha(0);
         versionText.setPosition(versionText.height * 0.5, height - versionText.height * 1.5);
