@@ -398,16 +398,34 @@ export class CharacterCreation extends Scene {
             .on('pointerdown', () => this.onFinishCharacterCreationAndStartNewGameButtonClicked());
         this.setStartGameButtonInteractivity(false);
 
-        x += width * 0.18;
+        x += width * 0.28;
 
-        // randomizeEverythingButton: GameObjects.Text
-        this.add.text(x, y, i18next.t(LocalizationId.ButtonRandomizeAll))
-            .setOrigin(0)
-            .setStyle(StyleConfig.bottomRowButtonStyle)
-            .setInteractive()
-            .on('pointerdown', () => this.onRandomizeEverythingButtonClicked());
+        const randomizeEverythingButton: GameObjects.Text =
+            this.add.text(x, y, i18next.t(LocalizationId.ButtonRandomizeAll))
+                .setOrigin(0.5, 0)
+                .setStyle(StyleConfig.bottomRowButtonStyle)
+                .setInteractive()
+                .on('pointerdown', () => {
+                    this.onRandomizeEverythingButtonClicked();
+                    this.tweens.killTweensOf(randomizeEverythingButton);
+                    this.tweens.chain({
+                        targets: randomizeEverythingButton,
+                        persist: false,
+                        tweens: [{
+                            scale: { from: randomizeEverythingButton.scale, to: 0.90 },
+                            ease: Phaser.Math.Easing.Quadratic.Out,
+                            duration: 1000 * Math.max(0.01, Math.abs(randomizeEverythingButton.scale - 0.9))
+                        },
+                        {
+                            scale: { from: 0.90, to: 1.00 },
+                            ease: Phaser.Math.Easing.Quadratic.Out,
+                            duration: 1000 * 0.1
+                        }
+                        ]
+                    });
+                });
 
-        x += width * 0.20;
+        x += width * 0.15;
 
         // backToMenuButton: GameObjects.Text
         this.add.text(x, y, i18next.t(LocalizationId.ButtonBackToMenu))
