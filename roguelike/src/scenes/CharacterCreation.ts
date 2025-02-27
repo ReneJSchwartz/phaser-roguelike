@@ -310,12 +310,34 @@ export class CharacterCreation extends Scene {
 
         for (let i = 0; i < 5; i++) {
             const singleAttributeContainer: GameObjects.Container = this.add.container(i * attributesXOffset, 0);
+            singleAttributeContainer.name = attributeNames[i] + ' container';
             const attributeCircle: GameObjects.Arc = this.add.circle(0, 0, height * 0.07, 0x000000, 1)
                 .setStrokeStyle(2, 0xffffff)
                 .setInteractive()
                 .on('pointerdown', () => {
-                    console.log('attributeCircle ' + Attribute[i] + ' pressed');
                     this.increaseAttribute(i as Attribute);
+                    this.tweens.killTweensOf(attributeCircle);
+                    this.tweens.chain({
+                        targets: attributeCircle,
+                        persist: false,
+                        tweens: [{
+                            scale: { from: attributeCircle.scale, to: 0.90 },
+                            ease: Phaser.Math.Easing.Quadratic.Out,
+                            duration: 1500 * Math.max(0.01, Math.abs(attributeCircle.scale - 0.9))
+                        },
+                        {
+                            scale: { from: 0.90, to: 1.00 },
+                            ease: Phaser.Math.Easing.Quadratic.Out,
+                            duration: 1500 * 0.1
+                        }
+                        ]
+                    });
+                })
+                .on('pointerover', () => {
+                    attributeCircle.setStrokeStyle(4, 0xffffff);
+                })
+                .on('pointerout', () => {
+                    attributeCircle.setStrokeStyle(2, 0xffffff);
                 });
             const attributeName: GameObjects.Text = this.add.text(0, 0, attributeNames[i])
                 .setOrigin(0)

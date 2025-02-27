@@ -71,7 +71,7 @@ To play as one put one point into Kno and another point into Kno/Con/Dex.`,
                         [LocalizationId.Attributes]:
                             "Attributes",
                         [LocalizationId.AttributesDesc]:
-                            `Attributes increase your effectiveness.\n
+                            `Attributes increase your effectiveness. The values go from decent to divine.\n
 Strength adds damage to hits and helps you wear armor and carry items.\n
 Dexterity helps you both land a hit and avoid hits.\n
 Constitution increases your health and helps you regain it and protects you from some ill effects.\n
