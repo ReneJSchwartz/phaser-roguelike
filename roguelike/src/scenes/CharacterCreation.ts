@@ -10,6 +10,7 @@ import { Attribute } from '../enums/attribute';
 import { StyleConfig } from '../config/style-config';
 import i18next from 'i18next';
 import { LocalizationId } from '../enums/localization-id';
+import SoundManager from 'phaser3-rex-plugins/plugins/utils/audio/soundmanager/SoundManager';
 
 /** 
  * Character creation view.
@@ -487,8 +488,8 @@ export class CharacterCreation extends Scene {
                 do {
                     newFace = this.d6Faces[Phaser.Math.Between(1, this.d6Faces.length - 1)];
                 } while (curFace === newFace)
-                // todo play dice sound
                 dieButton.text = newFace;
+                this.sound.play('dice-rolls-' + Phaser.Math.Between(1, 10));
             });
         return dieButton;
     }
@@ -751,9 +752,10 @@ export class CharacterCreation extends Scene {
     private onRandomizeEverythingButtonClicked(): void {
         console.log(CharacterCreation.name, this.onRandomizeEverythingButtonClicked.name);
 
-        this.selectAncestryCallbacks[Phaser.Math.Between(0, this.ancestriesTexts.length - 2)].call(this);
-
+        this.selectAncestryCallbacks[Phaser.Math.Between(0, this.ancestriesTexts.length - 2)]
+            .call(this);
         this.onRandomizeAttributesClicked();
+        this.sound.play('dice-rolls-' + Phaser.Math.Between(1, 10));
     }
 
     private onBackToMenuButtonClicked(): void {

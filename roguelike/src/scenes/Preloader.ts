@@ -56,6 +56,11 @@ export class Preloader extends Scene {
 
         // UI & Main Menu
         this.load.image('ui-border-1', 'panel-border-009.png');
+
+        //Audio
+        for (let index = 1; index <= 10; index++) {
+            this.load.audio('dice-rolls-' + index.toString(), 'audio/sfx/dice-rolls-' + index.toString() + '.wav');
+        }
     }
 
     create() {
