@@ -277,6 +277,7 @@ export class CharacterCreation extends Scene {
 
         // Attribute points section that is lower on the screen
         const attributesSectionContainer: GameObjects.Container = this.add.container(x, y);
+        attributesSectionContainer.name = 'attributesSectionContainer';
         const attributesSectionOutline: GameObjects.Rectangle = this.add.rectangle(0, 0, containerWidth, containerHeight)
             .setOrigin(0)
             .setStrokeStyle(1, 0xffffff);
@@ -284,12 +285,22 @@ export class CharacterCreation extends Scene {
             .setOrigin(0, 0)
             .setStyle({ fontSize: 32 });
         // Randomization happens by clicking a die.
-        const attributesSectionRandomizeDieButton: GameObjects.Text = this.createD6Button(containerWidth - 1.9 * em, textPadding,
+        const attributesSectionRandomizeDieButton: GameObjects.Text = this.createD6Button(
+            containerWidth - 1.9 * em,
+            textPadding,
             () => this.onRandomizeAttributesClicked());
+        const attributesSectionInfoButton: GameObjects.Container = this.createInfoButton(
+            containerWidth - 3.5 * em,
+            textPadding * 1.3,
+            () => this.showInfoOnInfoBox(
+                i18next.t(LocalizationId.Attributes),
+                i18next.t(LocalizationId.AttributesDesc)));
+
         attributesSectionContainer.add([
             attributesSectionOutline,
             this.attributesSectionTitle,
-            attributesSectionRandomizeDieButton]);
+            attributesSectionRandomizeDieButton,
+            attributesSectionInfoButton]);
 
         // Attribute circles, numbers and legend
         // Clicking these will increase the attribute amount or reset it back to 0.
@@ -341,8 +352,14 @@ export class CharacterCreation extends Scene {
             .on('pointerdown', () => {
                 this.showInfoOnInfoBox(i18next.t(LocalizationId.Stats), i18next.t(LocalizationId.InfoStats))
             });
+        const statsSectionInfoButton: GameObjects.Container = this.createInfoButton(
+            containerWidth - 1.9 * em,
+            textPadding * 1.3,
+            () => this.showInfoOnInfoBox(
+                i18next.t(LocalizationId.Stats),
+                i18next.t(LocalizationId.InfoStats)));
         this.updateStatsSectionStats();
-        statsSectionContainer.add([statsSectionOutline, this.statsSectionText]);
+        statsSectionContainer.add([statsSectionOutline, this.statsSectionText, statsSectionInfoButton]);
 
         // Bottom of the screen buttons
 
@@ -452,6 +469,26 @@ export class CharacterCreation extends Scene {
                 dieButton.text = newFace;
             });
         return dieButton;
+    }
+
+    /** Creates a circle and i which can be pressed to show info. */
+    private createInfoButton(x: number, y: number, lambda: { (): void }): GameObjects.Container {
+        const infoButtonCircle: GameObjects.Arc = this.add.circle(0, 0, 15)
+            .setStrokeStyle(2, 0xffffff)
+            .setOrigin(0)
+            .setInteractive()
+            .on('pointerdown', () => {
+                console.log('pressed info button');
+                lambda();
+            });
+        infoButtonCircle.name = 'infoButtonCircle';
+        const infoText: GameObjects.Text = this.add.text(0, 0, 'i')
+            .setOrigin(0, 0)
+            .setStyle({ fontSize: 24, color: '#fff' })
+            .setPadding(8, 3, 0, 0);
+        infoText.name = 'infoButtonText i';
+
+        return this.add.container(x, y).add([infoButtonCircle, infoText]);
     }
 
     /** 

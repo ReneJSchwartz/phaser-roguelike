@@ -33,6 +33,8 @@ export enum LocalizationId {
     GnomeDesc = "Gnome description",
     CharacterCreationTitle = "Character Creation",
     Name = "Name",
+    Attributes = "Attributes",
+    AttributesDesc = "Attributes description",
     AttributesXRemaining = "Attributes (5 remaining)",
     Stats = "Stats",
     // long description about stats

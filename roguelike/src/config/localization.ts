@@ -68,6 +68,15 @@ To play as one put one point into Kno and another point into Kno/Con/Dex.`,
                             "Randomize All",
                         [LocalizationId.ButtonBackToMenu]:
                             "Back To Menu",
+                        [LocalizationId.Attributes]:
+                            "Attributes",
+                        [LocalizationId.AttributesDesc]:
+                            `Attributes increase your effectiveness.\n
+Strength adds damage to hits and helps you wear armor and carry items.\n
+Dexterity helps you both land a hit and avoid hits.\n
+Constitution increases your health and helps you regain it and protects you from some ill effects.\n
+Spirit is your magical connection to the world. It aids you in spellcasting.\n
+Knowledge measures your knowledge, expertise in techniques and your learning ability.`,
                         [LocalizationId.AttributesXRemaining]:
                             "Attributes ({numAttributes} remaining)",
                         [LocalizationId.Stats]:
