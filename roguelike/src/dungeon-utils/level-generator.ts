@@ -2,7 +2,7 @@ import { FoeSetup } from "../entities/foe-setup";
 import { Player } from "../entities/entities";
 import { GameplayUi } from "../scenes/GameplayUi";
 import { Level } from "./level";
-import { LevelRenderer } from "./level-renderer";
+import { LevelRenderer } from "../scenes/LevelRenderer";
 
 /** 
  * Used to make ASCII roguelike levels that fit the game. 
@@ -21,11 +21,11 @@ import { LevelRenderer } from "./level-renderer";
  * base layer and then comes items and then enemies. 
  * 
  * This script makes the maps and enemy/item collections and sends them forward
- * to @see LevelRenderer and/or other systems to be processed.
+ * to {@link LevelRenderer} and/or other systems to be processed.
  * 
- * Level coordinates begin from x0, y0 at top left corner. Coordinante is 
+ * Level coordinates begin from x0, y0 at top left corner. Coordinate is
  * accessed by searching levelbase[y][x] (string array), or by querying maps
- * with key x,y.
+ * (enemy, etc) with key ['x,y'].
  * */
 export class LevelGenerator {
     /** 
@@ -62,8 +62,7 @@ export class LevelGenerator {
         let playerSpawnY: number = 0;
         const stairSpawnPositionsXY: number[][] = [[8, 2], [2, 1], [1, 7], [7, 8]]
         if (floor === -1) {
-            // Yard leading up to the tower.
-            // In smaller scale.
+            // Yard leading up to the tower in smaller scale.
             room.push("..........");
             room.push("...####.⚶.");
             room.push("..######..");
@@ -79,6 +78,8 @@ export class LevelGenerator {
             playerSpawnY = 8;
         }
         else if (floor === 0) {
+            // First floor is a bit different. It shows the flowers outside,
+            // and has a message to communicate to player.
             room.push("  ######  ");
             room.push(" #......# ");
             room.push("#.......^#");
@@ -96,6 +97,7 @@ export class LevelGenerator {
             GameplayUi.Instance.addToLogText('The doors slam shut.')
         }
         else if (floor > 0) {
+            // Basic dungeon level with rotating stair position.
             room.push("  ######  ");
             room.push(" #......# ");
             room.push("#........#");
@@ -106,18 +108,23 @@ export class LevelGenerator {
             room.push("#........#");
             room.push(" #......# ");
             room.push("  ######  ");
-            // Insert rotating stairs upwards
-            let stairRow = room[stairSpawnPositionsXY[floor % 4][1]];
-            stairRow = stairRow.slice(0, stairSpawnPositionsXY[floor % 4][0])
-                + '^' + stairRow.slice(stairSpawnPositionsXY[floor % 4][0] + 1);
-            room[stairSpawnPositionsXY[floor % 4][1]] = stairRow;
+
+            // Insert rotating stairs upwards. 
+            const stairPos: number[] = stairSpawnPositionsXY[floor % 4];
+            let stairRow = room[stairPos[1]];
+            stairRow = stairRow.slice(0, stairPos[0])
+                + '^' + stairRow.slice(stairPos[0] + 1);
+            room[stairPos[1]] = stairRow;
 
             playerSpawnX = Player.Instance.x;
             playerSpawnY = Player.Instance.y;
         }
+
         Player.Instance.setPosition(playerSpawnX, playerSpawnY, false);
 
-        // generate monsters
+        // Generate monsters to every empty tile in this dungeon.
+        // Could maybe be refactored to its own function later
+        // when more monster generation algos have been made.
         for (let y = 0; y < room.length; y++) {
             for (let x = 0; x < room[y].length; x++) {
                 // don't spawn monster to player's starting tile

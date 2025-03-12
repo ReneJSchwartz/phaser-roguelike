@@ -1,8 +1,9 @@
 import { Scene } from 'phaser';
+import { Preloader } from './Preloader';
 
 /** 
  * First scene of the game. 
- * A lite preloader for the actual @see Preloader scene if you will.
+ * A lite preloader for the actual {@link Preloader} scene if you will.
  *  */
 export class Boot extends Scene {
     constructor() {

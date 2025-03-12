@@ -11,13 +11,24 @@ import { Player } from "../entities/entities";
  * which can act independently.
  */
 export class LevelRenderer extends Scene {
+    // Level grid construction.
+    /** Level grid cell's width. Each cell houses an ASCII character. */
     private cellWidth: number = 0;
+    /** Level grid cell's height. Each cell houses an ASCII character. */
     private cellHeight: number = 0;
+    /** Where the level/map edge should be drawn measured from left. */
     private gridStartX: number = 0;
+    /** Where the level/map edge should be drawn measured from top. */
     private gridStartY: number = 0;
+    /** Instance as access pattern for singletonish LevelRenderer. */
     public static Instance: LevelRenderer;
 
-    /** Style and other info for spawned entities */
+    /** 
+     * Style and other info for spawned entities that can be used when 
+     * spawning the entities. Important things are color, possible bg color,
+     * placement info, and description. 
+     * EntityConfig can be extended to have custom spawn rules.
+     */
     private entitySpawnConfigs: Map<string, EntityConfig> = new Map<string, EntityConfig>([
         ['@', { textStyle: {}, description: "That's me!" }],
         // Environment
@@ -38,14 +49,18 @@ export class LevelRenderer extends Scene {
         ['h', { textStyle: { color: "#ff8000", }, description: 'Hobgoblin' }],
     ]);
 
-
+    /** Creates class instance. */
     constructor() {
         super('LevelRenderer');
         LevelRenderer.Instance = this;
     }
 
+    /** 
+     * Configures level grid parameters and optionally can show the grid 
+     * if needed for debugging purposes.
+     */
     create() {
-        console.log(LevelRenderer.name);
+        console.log(LevelRenderer.name, 'create');
         const { width, height } = this.scale;
         this.cellWidth = width * 0.02;
         this.cellHeight = width * 0.028;
@@ -115,10 +130,12 @@ export class LevelRenderer extends Scene {
                 GameplayUi.Instance.updateYouSeeText(
                     this.entitySpawnConfigs.get('@')?.description ?? '');
             });
+
         Player.Instance.charText = char;
         Level.baseLayerTexts.get(`${Player.Instance.y},${Player.Instance.x}`)?.setAlpha(0);
     }
 
+    /** Spawns monsters to field. */
     private spawnMonsters(): void {
         Level.dungeonMonsters.forEach((m) => {
             const char: GameObjects.Text = this.add.text(
@@ -131,24 +148,38 @@ export class LevelRenderer extends Scene {
                     GameplayUi.Instance.updateYouSeeText(
                         this.entitySpawnConfigs.get(m.character)?.description ?? '');
                 });
+
             m.charText = char;
             Level.baseLayerTexts.get(`${m.y},${m.x}`)?.setAlpha(0);
         })
     }
 
-    /** Returns tile coordinates from grid coordinates. */
+    /** 
+     * Returns tile's x or y coordinate from grid/tile coordinate.
+     * 
+     * @param horizontalTileNumber How many tiles from left edge the char is at.
+     * @returns Where to place a grid cell's char on screen's x-position.
+     */
     public gridX(horizontalTileNumber: number): number {
         return this.gridStartX + horizontalTileNumber * this.cellWidth
     }
 
-    /** Returns tile coordinates from grid coordinates. */
+    /** 
+     * Returns tile's x or y coordinate from grid/tile coordinate.
+     * 
+     * @param verticalTileNumber How many tiles from top edge the char is at.
+     * @returns Where to place a grid cell's char on screen's x-position.
+     */
     public gridY(verticalTileNumber: number): number {
         return this.gridStartY + verticalTileNumber * this.cellHeight
     }
 
     /** 
      * Can be used to redraw the things that were hidden 
-     * when prev tile owner was here.
+     * because previous tile owner/entity appeared to the tile.
+     * 
+     * @param x Horizontal tile.
+     * @param y Vertical tile.
      */
     public entityLeaveTile(x: number, y: number): void {
         Level.baseLayerTexts.get(`${y},${x}`)?.setAlpha(1);

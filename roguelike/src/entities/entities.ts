@@ -45,8 +45,8 @@ export abstract class Entity {
             this.charText?.setAlpha(0);
             LevelRenderer.Instance.entityLeaveTile(this.x, this.y);
             const deleted = Level.dungeonMonsters.delete(`${this.x},${this.y}`);
-            if (deleted) {
-                console.log('monster deleted at : ' + `${this.x},${this.y}`)
+            if (!deleted) {
+                console.log('did not delete monster');
             }
         }
     }
