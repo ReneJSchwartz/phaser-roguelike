@@ -4,13 +4,12 @@ import { Ancestries } from '../character-creation/ancestries';
 import { Ancestry } from '../character-creation/ancestry';
 import { AncestryType } from '../enums/ancestry-type';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
-import { Player } from '../entities/player';
+import { Player } from '../entities/entities';
 import { Attributes } from '../character-creation/attributes';
 import { Attribute } from '../enums/attribute';
 import { StyleConfig } from '../config/style-config';
 import i18next from 'i18next';
 import { LocalizationId } from '../enums/localization-id';
-import SoundManager from 'phaser3-rex-plugins/plugins/utils/audio/soundmanager/SoundManager';
 
 /** 
  * Character creation view.
@@ -22,7 +21,7 @@ import SoundManager from 'phaser3-rex-plugins/plugins/utils/audio/soundmanager/S
  * 
  * The view has unicode dies for randomization but otherwise buttons are just 
  * regular text. The player can proceed after their attribute points pass 
- * a ancestry requirements check.
+ * an ancestry requirements check.
  */
 export class CharacterCreation extends Scene {
     /** A simple way to prevent buttons from firing multiple times. */
@@ -821,9 +820,9 @@ export class CharacterCreation extends Scene {
         });
 
         this.time.delayedCall(550, () => {
-            this.scene.start('Game');
             this.scene.launch('LevelRenderer');
             this.scene.launch('GameplayUi');
+            this.scene.start('Game');
         });
     }
 }

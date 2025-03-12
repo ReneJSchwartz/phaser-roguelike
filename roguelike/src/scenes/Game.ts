@@ -1,6 +1,6 @@
 import { Input, Scene } from 'phaser';
 import { GameManager } from '../game-manager';
-import { Player } from '../entities/player';
+import { Player } from '../entities/entities';
 
 /** 
  * Main adventure gamemode that is started by selecting New Game

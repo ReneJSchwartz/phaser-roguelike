@@ -1,6 +1,5 @@
-import { Foe } from "../entities/foe";
-import { Foes } from "../entities/foes";
-import { Player } from "../entities/player";
+import { FoeSetup } from "../entities/foe-setup";
+import { Player } from "../entities/entities";
 import { GameplayUi } from "../scenes/GameplayUi";
 import { Level } from "./level";
 import { LevelRenderer } from "./level-renderer";
@@ -57,7 +56,7 @@ export class LevelGenerator {
         LevelGenerator.levelCleanup();
 
         const floor = Level.currentFloor;
-        
+
         const room: string[] = [];
         let playerSpawnX: number = 0;
         let playerSpawnY: number = 0;
@@ -109,7 +108,8 @@ export class LevelGenerator {
             room.push("  ######  ");
             // Insert rotating stairs upwards
             let stairRow = room[stairSpawnPositionsXY[floor % 4][1]];
-            stairRow = stairRow.slice(0, stairSpawnPositionsXY[floor % 4][0]) + '^' + stairRow.slice(stairSpawnPositionsXY[floor % 4][0] + 1);
+            stairRow = stairRow.slice(0, stairSpawnPositionsXY[floor % 4][0])
+                + '^' + stairRow.slice(stairSpawnPositionsXY[floor % 4][0] + 1);
             room[stairSpawnPositionsXY[floor % 4][1]] = stairRow;
 
             playerSpawnX = Player.Instance.x;
@@ -126,7 +126,7 @@ export class LevelGenerator {
                 }
 
                 if (room[y][x] === '.' && Phaser.Math.Between(1, 100) <= 5) {
-                    let foe = Foes.generateFoe();
+                    let foe = FoeSetup.generateFoe();
                     foe.x = x;
                     foe.y = y;
                     Level.dungeonMonsters.set(`${x},${y}`, foe);

@@ -2,7 +2,7 @@ import { GameObjects, Scene } from "phaser";
 import { Level } from "../dungeon-utils/level";
 import { EntityConfig } from "../interfaces/entity-config";
 import { GameplayUi } from "./GameplayUi";
-import { Player } from "../entities/player";
+import { Player } from "../entities/entities";
 
 /** 
  * Renders parts of the level what will become visible to the player.

@@ -1,7 +1,7 @@
 import { Ancestries } from "./character-creation/ancestries";
 import { Level } from "./dungeon-utils/level";
 import { LevelGenerator } from "./dungeon-utils/level-generator";
-import { Player } from "./entities/player";
+import { Player } from "./entities/entities";
 import { GameplayUi } from "./scenes/GameplayUi";
 import { LevelRenderer } from "./scenes/LevelRenderer";
 
