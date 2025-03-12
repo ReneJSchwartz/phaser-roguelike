@@ -64,7 +64,7 @@ export class Preloader extends Scene {
     }
 
     create() {
-        // TODO Camera fade between scenes.
+        // TODO Camera fade between scenes, could be done with camera.postFx?
 
         this.time.delayedCall(this.fullyLoadedLingerTimeMs, () => {
             this.scene.start('PressAnyKey');

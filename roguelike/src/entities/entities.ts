@@ -80,6 +80,7 @@ export class Player extends Entity {
     private ancestryName: string = 'Human';
     /** Ancestry as enum. */
     private ancestryType: AncestryType = AncestryType.Human;
+    /** Name of the player. */
     private name: string = 'John Doe';
     /** Attributes/stat points are between 0 and 3 (Avg/Good/Great/Divine). */
     private attributes: Attributes;
@@ -94,13 +95,17 @@ export class Player extends Entity {
      */
     public static Instance: Player;
 
-    /** Sets up the singleton. */
+    /** Sets up the Instance. */
     constructor() {
         super(42, 42);
         Player.Instance = this;
     }
 
     // Movement
+    /** 
+     * Moves player right if possible or attacks what is there. 
+     * Called from Game scene's input handling. 
+     */
     public moveRight(): void {
         // if not on grid do nothing
         if (this.x >= Level.levelHeight) {
@@ -130,6 +135,7 @@ export class Player extends Entity {
         }
     }
 
+    /** Moves player left if possible or attacks what is there. */
     public moveLeft(): void {
         if (this.x <= 0) {
             GameManager.Instance.goOutsideArea();
@@ -153,6 +159,7 @@ export class Player extends Entity {
         }
     }
 
+    /** Moves player upwards if possible or attacks what is there. */
     public moveUp(): void {
         if (this.y <= 0) {
             GameManager.Instance.goOutsideArea();
@@ -176,6 +183,7 @@ export class Player extends Entity {
         }
     }
 
+    /** Moves player downwards if possible or attacks what is there. */
     public moveDown(): void {
         if (this.y >= Level.levelHeight) {
             GameManager.Instance.goOutsideArea();
@@ -200,7 +208,12 @@ export class Player extends Entity {
     }
 
     // Attacking
-
+    /**
+     * Attacks a monster at location.
+     * 
+     * @param x Horizontal tile.
+     * @param y Vertical tile.
+     */
     private attackMonster(x: number, y: number) {
         const monster = Level.dungeonMonsters.get(`${x},${y}`);
         // console.log(monster?.currentHitPoints);
@@ -208,7 +221,12 @@ export class Player extends Entity {
     }
 
     // Character creation
-    /** Sets player's ancestry. */
+    /** 
+     * Sets player's ancestry and ancestry name.
+     * 
+     * @param ancestryType Type of player's ancestry.
+     * @param ancestryName Name of player's ancestry. 
+     */
     public setAncestry(ancestryType: AncestryType, ancestryName: string): void {
         /* eslint-disable-next-line prefer-rest-params -- Don't think this rule applies here. */
         console.log(Player.name, this.setAncestry.name, ...arguments);
@@ -217,7 +235,12 @@ export class Player extends Entity {
         this.ancestryType = ancestryType;
     }
 
-    /** Sets max hitpoints for the player. Does not heal the player. */
+    /** 
+     * Sets or rather initializes max hitpoints for the player.
+     * Does not heal the player.
+     * 
+     * @param amount Max hit points to set. I.e. 35.
+     */
     public setMaxHitPoints(amount: number): void {
         /* eslint-disable-next-line prefer-rest-params -- Don't think this rule applies here. */
         console.log(Player.name, this.setMaxHitPoints.name, ...arguments);
@@ -225,7 +248,11 @@ export class Player extends Entity {
         this.maxHitPoints = amount;
     }
 
-    /** Sets player's attributes. */
+    /** 
+     * Sets player's attributes.
+     *
+     * @param attributes Attributes to assign to player. 
+     */
     public setAttributes(attributes: Attributes) {
         /* eslint-disable-next-line prefer-rest-params -- Don't think this rule applies here. */
         console.log(Player.name, this.setAttributes.name, ...arguments);
@@ -233,7 +260,11 @@ export class Player extends Entity {
         this.attributes = attributes;
     }
 
-    /** Sets player's name. */
+    /** 
+     * Sets player's name.
+     * 
+     * @param name Name to give to player.
+     */
     public setName(name: string) {
         /* eslint-disable-next-line prefer-rest-params -- Don't think this rule applies here. */
         console.log(Player.name, this.setName.name, ...arguments);
@@ -242,8 +273,12 @@ export class Player extends Entity {
     }
 }
 
-/** Enemy class. */
+/** Enemy class. Enemies share some functionality with the player. */
 export class Foe extends Entity {
+    /** 
+     * When foes are created their position can also be saved. Position can 
+     * also be saved at a later time (which is how the sausage is made atm).
+     */
     constructor(x: number, y: number) {
         super(x, y);
     }

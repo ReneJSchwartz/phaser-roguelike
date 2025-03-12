@@ -16,23 +16,34 @@ import { Player } from '../entities/entities';
  */
 export class Game extends Scene {
     // Player input handling (must be done in scene to access plugin?).
+    /** 
+     * Just pressed up? Look into refactoring using ready made functions.
+     * Was used to limit user zooming through the map with light speed.
+     */
     private firstUpPress = true;
+    /** Just pressed down? */
     private firstDownPress = true;
+    /** Just pressed left? */
     private firstLeftPress = true;
+    /** Just pressed right? */
     private firstRightPress = true;
 
     constructor() {
         super('Game');
     }
 
-    /** Create UI and start the game. */
+    /** Starts the game via Game Manager. */
     create() {
-        // Show map and begin game loop.
+        // Show level and UI and begin game loop.
         GameManager.Instance.startGame();
     }
 
     /** Processes input for the player. */
     update() {
+        // todo Refactor (see free Phaser book). 
+
+        // Processes pressing up to move or attack there. 
+        // Also limits presses to only those made this frame. 
         const upW: Input.Keyboard.Key = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         const upArrow: Input.Keyboard.Key = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         if (this.firstUpPress && (upW?.isDown || upArrow.isDown)) {
@@ -42,6 +53,7 @@ export class Game extends Scene {
         else if (!(upW?.isDown || upArrow.isDown)) {
             this.firstUpPress = true;
         }
+
         const downS: Input.Keyboard.Key = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         const downArrow: Input.Keyboard.Key = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         if (this.firstDownPress && (downS?.isDown || downArrow.isDown)) {

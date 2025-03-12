@@ -139,7 +139,12 @@ export class MainMenu extends Scene {
         this.buttonsEntranceTweens([quitGameButtonContainer, newGameButtonContainer], width * 0.87);
     }
 
-    /** Buttons entrance from the left side. */
+    /** 
+     * Buttons' entrance from the left side. 
+     *
+     * @param targets Targets to tween: the buttons.
+     * @param position Where to tween buttons on x-position.
+     */
     private buttonsEntranceTweens(targets: GameObjects.Container[], position: number): void {
         this.add.tween({
             targets: targets,

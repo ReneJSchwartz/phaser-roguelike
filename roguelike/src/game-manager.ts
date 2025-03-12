@@ -9,12 +9,9 @@ import { LevelRenderer } from "./scenes/LevelRenderer";
  * Processes general game logic with the help of other classes.
  * */
 export class GameManager {
-    /** Level generator. */
-    private levelGen: LevelGenerator;
-    /** Seed the playthrough uses. */
+    /** Seed that the gameplay uses. */
     private gameSeed: number = Phaser.Math.RND.integer();
-    // todo add couple random number generators for level generation
-    // and other functionality like combat
+    /** Instance as access pattern for singletonish GameManager. */
     public static Instance: GameManager;
 
     /** Sets up singleton and sets up other game systems like Player. */
@@ -22,12 +19,12 @@ export class GameManager {
         GameManager.Instance = this;
         new Player();
         new Ancestries();
+        new LevelGenerator();
     }
 
     /** Starts game after making a character. */
     public startGame(): void {
         console.log('Game started on GameManager.');
-        this.levelGen = new LevelGenerator();
         Level.currentFloor = -1;
         LevelGenerator.generate7drlDungeonRoom();
         LevelRenderer.Instance.spawnMapEntities();
