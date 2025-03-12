@@ -820,6 +820,10 @@ export class CharacterCreation extends Scene {
             })
         });
 
-        this.time.delayedCall(550, () => this.scene.start('Game'));
+        this.time.delayedCall(550, () => {
+            this.scene.start('Game');
+            this.scene.launch('LevelRenderer');
+            this.scene.launch('GameplayUi');
+        });
     }
 }

@@ -1,11 +1,12 @@
 import { Ancestries } from "./character-creation/ancestries";
+import { Level } from "./dungeon-utils/level";
 import { LevelGenerator } from "./dungeon-utils/level-generator";
 import { Player } from "./entities/player";
+import { GameplayUi } from "./scenes/GameplayUi";
+import { LevelRenderer } from "./scenes/LevelRenderer";
 
 /** 
  * Processes general game logic with the help of other classes.
- * 
- * Stub until game logic has been designed & diagrammed.
  * */
 export class GameManager {
     /** Level generator. */
@@ -27,7 +28,30 @@ export class GameManager {
     public startGame(): void {
         console.log('Game started on GameManager.');
         this.levelGen = new LevelGenerator();
-        console.log('level:\n' + this.levelGen.generateLevel().join('\n'));
-        console.log(Player.Instance);
+        Level.currentFloor = -1;
+        LevelGenerator.generate7drlDungeonRoom();
+        LevelRenderer.Instance.spawnMapEntities();
+    }
+
+    /** 
+     * When in dungeon the player can go up a level from a '^' char.
+     * Placeholder: made for the 7-day roguelike challenge jam. 
+     */
+    public ascendFloor(): void {
+        Level.currentFloor++;
+        LevelGenerator.generate7drlDungeonRoom();
+        LevelRenderer.Instance.spawnMapEntities();
+        Level.baseLayerTexts.get(`${Player.Instance.y},${Player.Instance.x}`)?.setAlpha(0);
+        GameplayUi.Instance.updateYouSeeText('');
+    }
+
+    /** 
+     * Possible in areas accessible from world map.
+     * Going out of bounds there brings player back to world map. 
+     */
+    public goOutsideArea(): void {
+        // during jam going outside a dungeon area / town is not possible.
+        // could check if level.WordMapLeavable is true
+        GameplayUi.Instance.addMovementWarningToLog(`Can't go back to world map.`);
     }
 }
